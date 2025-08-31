@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, MessageSquare, Settings, Trash2, Bot, ChevronDown } from 'lucide-react';
+import { Plus, MessageSquare, Settings, Trash2, Bot, ChevronDown, X } from 'lucide-react';
 import { Conversation } from '../types';
 
 interface SidebarProps {
@@ -11,6 +11,7 @@ interface SidebarProps {
   onOpenSettings: () => void;
   settings: { selectedModel: 'google' | 'zhipu' };
   onModelChange: (model: 'google' | 'zhipu') => void;
+  onCloseSidebar: () => void;
 }
 
 export function Sidebar({
@@ -22,6 +23,7 @@ export function Sidebar({
   onOpenSettings,
   settings,
   onModelChange,
+  onCloseSidebar,
 }: SidebarProps) {
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
 
@@ -30,9 +32,17 @@ export function Sidebar({
       className="w-64 bg-[var(--color-sidebar)] flex flex-col h-full border-r border-[var(--color-border)] sidebar transition-transform duration-300 ease-in-out fixed md:static z-50"
     >
       <div className="p-4 border-b border-[var(--color-border)]">
-        <div className="flex items-center gap-2 mb-4">
-          <Bot className="w-6 h-6 text-[var(--color-accent)]" />
-          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Bot className="w-6 h-6 text-[var(--color-accent)]" />
+            <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
+          </div>
+          <button
+            onClick={onCloseSidebar}
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 md:hidden"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
         <button
           onClick={onNewConversation}
@@ -42,7 +52,6 @@ export function Sidebar({
           New chat
         </button>
 
-        {/* Model Selection Dropdown */}
         <div className="relative mt-3">
           <button
             onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
