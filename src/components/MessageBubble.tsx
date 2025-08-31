@@ -32,7 +32,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
       )}
       <div
         className={`relative max-w-[80%] p-4 rounded-xl bg-gray-600 dark:bg-gray-500 ${
-          isUser ? 'text-black dark:text-white font-semibold' : 'text-black dark:text-white'
+          isUser ? 'text-black font-semibold' : 'text-black'
         }`}
       >
         {!isUser && model && (
