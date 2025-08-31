@@ -10,9 +10,21 @@ interface ChatAreaProps {
   isLoading: boolean;
   streamingMessage?: Message | null;
   hasApiKey: boolean;
+  model?: 'google' | 'zhipu';
+  onEditMessage?: (messageId: string, newContent: string) => void;
+  onRegenerateResponse?: (messageId: string) => void;
 }
 
-export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage, hasApiKey }: ChatAreaProps) {
+export function ChatArea({ 
+  messages, 
+  onSendMessage, 
+  isLoading, 
+  streamingMessage, 
+  hasApiKey,
+  model,
+  onEditMessage,
+  onRegenerateResponse
+}: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -56,6 +68,9 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
                 key={message.id}
                 message={message}
                 isStreaming={streamingMessage?.id === message.id}
+                model={model}
+                onEditMessage={onEditMessage}
+                onRegenerateResponse={onRegenerateResponse}
               />
             ))}
           </div>
