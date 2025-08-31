@@ -34,7 +34,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
   }, [input]);
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
       <form onSubmit={handleSubmit} className="relative">
         <textarea
           ref={textareaRef}
@@ -43,13 +43,13 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           onKeyDown={handleKeyDown}
           placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
           disabled={disabled || isLoading}
-          className="w-full min-h-[52px] max-h-[120px] p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+          className="w-full min-h-[52px] max-h-[120px] p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
           rows={1}
         />
         <button
           type="submit"
           disabled={!input.trim() || isLoading || disabled}
-          className="absolute right-3 bottom-3 p-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+          className="absolute right-3 bottom-3 p-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
