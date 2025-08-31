@@ -29,6 +29,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
           <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
+      
       <div
         className={`relative max-w-[80%] p-4 rounded-xl bg-gray-200 dark:bg-gray-300 ${
           isUser ? 'text-black font-semibold' : 'text-black font-medium'
@@ -39,6 +40,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
             {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
           </div>
         )}
+        
         <div className={`prose prose-base max-w-none leading-relaxed ${isUser ? 'font-semibold' : ''}`}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -88,16 +90,18 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
             <span className="inline-block w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-pulse ml-1"></span>
           )}
         </div>
-        {!isUser && (
+        
+        {!isUser && !isStreaming && message.content.length > 0 && (
           <button
             onClick={handleCopy}
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             style={{ zIndex: 10 }}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
         )}
       </div>
+      
       {isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
           <Smile className="w-5 h-5 text-white" />
