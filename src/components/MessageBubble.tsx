@@ -33,8 +33,8 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
       <div
         className={`max-w-[80%] p-4 rounded-xl ${
           isUser
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+            ? 'bg-gray-600 dark:bg-gray-500 text-white'
+            : 'bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
         }`}
       >
         <div className="prose prose-base max-w-none leading-relaxed">
@@ -54,7 +54,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
-                  <code className="bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
+                  <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
                     {children}
                   </code>
                 );
@@ -83,7 +83,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
             {message.content}
           </ReactMarkdown>
           {isStreaming && (
-            <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1"></span>
+            <span className="inline-block w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-pulse ml-1"></span>
           )}
         </div>
         <div className="flex justify-between items-center mt-2 text-xs text-gray-400 dark:text-gray-500">
@@ -102,7 +102,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         )}
       </div>
       {isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-blue-500">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
           <User className="w-5 h-5 text-white" />
         </div>
       )}
