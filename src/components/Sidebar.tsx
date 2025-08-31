@@ -59,7 +59,6 @@ export function Sidebar({
           <Plus className="w-4 h-4" />
           New chat
         </button>
-
         <div className="relative mt-3">
           <button
             onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
@@ -92,7 +91,6 @@ export function Sidebar({
           )}
         </div>
       </div>
-
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
           {conversations.length === 0 ? (
