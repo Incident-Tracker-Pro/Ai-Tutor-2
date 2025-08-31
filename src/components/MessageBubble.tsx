@@ -5,7 +5,6 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { User, Bot, Copy, Check } from 'lucide-react';
 import { Message } from '../types';
-import { formatDate } from '../utils/helpers';
 
 interface MessageBubbleProps {
   message: Message;
@@ -88,9 +87,6 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
           {isStreaming && (
             <span className="inline-block w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-pulse ml-1"></span>
           )}
-        </div>
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-400 dark:text-gray-500">
-          <span>{formatDate(message.timestamp)}</span>
         </div>
         {!isUser && (
           <button
