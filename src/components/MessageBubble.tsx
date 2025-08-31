@@ -31,7 +31,10 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         </div>
       )}
       <div
-        className={`relative max-w-[80%] p-4 rounded-xl ${isUser ? 'bg-blue-500 text-white dark:text-white' : 'bg-white dark:bg-gray-700 text-black dark:text-white'}`}>
+        className={`relative max-w-[80%] p-4 rounded-xl bg-gray-600 dark:bg-gray-500 ${
+          isUser ? 'text-black dark:text-white font-semibold' : 'text-black dark:text-white'
+        }`}
+      >
         {!isUser && model && (
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
             {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
@@ -54,7 +57,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
-                  <code className="bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm text-black dark:text-white" {...props}>
+                  <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
                     {children}
                   </code>
                 );
@@ -70,13 +73,13 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
               },
               th({ children }) {
                 return (
-                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-200 dark:bg-gray-600 font-medium text-black dark:text-white">
+                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium">
                     {children}
                   </th>
                 );
               },
               td({ children }) {
-                return <td className="border border-gray-300 dark:border-gray-600 p-2 text-black dark:text-white">{children}</td>;
+                return <td className="border border-gray-300 dark:border-gray-600 p-2">{children}</td>;
               },
             }}
           >
@@ -86,7 +89,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
             <span className="inline-block w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-pulse ml-1"></span>
           )}
         </div>
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex justify-between items-center mt-2 text-xs text-gray-400 dark:text-gray-500">
           <span>{formatDate(message.timestamp)}</span>
         </div>
         {!isUser && (
@@ -100,7 +103,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         )}
       </div>
       {isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 dark:bg-blue-600">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
           <User className="w-5 h-5 text-white" />
         </div>
       )}
