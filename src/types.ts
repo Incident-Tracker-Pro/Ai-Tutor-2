@@ -5,6 +5,7 @@ export interface Message {
   timestamp: Date;
   isEditing?: boolean;
   originalContent?: string;
+  model?: 'google' | 'zhipu'; // Store which model generated this message
 }
 
 export interface Conversation {
