@@ -9,7 +9,7 @@ import { Message } from '../types';
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
-  model?: 'google' | 'zhipu';
+  model?: 'google' | 'zhipu'; // Current selected model (for display purposes only)
   onEditMessage?: (messageId: string, newContent: string) => void;
   onRegenerateResponse?: (messageId: string) => void;
 }
@@ -17,7 +17,7 @@ interface MessageBubbleProps {
 export function MessageBubble({ 
   message, 
   isStreaming = false, 
-  model, 
+  model, // This is the current selected model
   onEditMessage,
   onRegenerateResponse
 }: MessageBubbleProps) {
@@ -26,6 +26,9 @@ export function MessageBubble({
   const [editContent, setEditContent] = useState(message.content);
   const [isEditing, setIsEditing] = useState(message.isEditing || false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Use the model stored in the message for assistant messages, fallback to current model
+  const displayModel = isUser ? undefined : (message.model || model);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content);
@@ -86,9 +89,10 @@ export function MessageBubble({
           isUser ? 'text-black font-semibold' : 'text-black font-medium'
         }`}
       >
-        {!isUser && model && (
+        {/* Only show model name for assistant messages and use the stored model */}
+        {!isUser && displayModel && (
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
-            {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
+            {displayModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}
           </div>
         )}
         
@@ -175,8 +179,10 @@ export function MessageBubble({
           </div>
         )}
         
+        {/* Action buttons - Only show for non-editing, non-streaming messages with content */}
         {!isEditing && !isStreaming && message.content.length > 0 && (
           <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Regenerate button - Only for assistant messages */}
             {!isUser && onRegenerateResponse && (
               <button
                 onClick={handleRegenerate}
@@ -186,6 +192,7 @@ export function MessageBubble({
                 <RefreshCcw className="w-4 h-4" />
               </button>
             )}
+            {/* Edit button - Available for all messages */}
             {onEditMessage && (
               <button
                 onClick={handleEdit}
@@ -195,13 +202,16 @@ export function MessageBubble({
                 <Edit2 className="w-4 h-4" />
               </button>
             )}
-            <button
-              onClick={handleCopy}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-              title="Copy message"
-            >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            </button>
+            {/* Copy button - Only for assistant messages */}
+            {!isUser && (
+              <button
+                onClick={handleCopy}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                title="Copy message"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </button>
+            )}
           </div>
         )}
       </div>
