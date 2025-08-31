@@ -24,7 +24,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
   };
 
   return (
-    <div className={`flex gap-3 mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex gap-3 mb-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
           <Bot className="w-5 h-5 text-gray-600 dark:text-gray-300" />
