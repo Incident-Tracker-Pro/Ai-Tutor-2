@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, MessageSquare, Settings, Trash2, Bot, ChevronDown, X, ChevronLeft, ChevronRight, BookOpen, FileText } from 'lucide-react';
+import { Plus, MessageSquare, Settings, Trash2, Bot, ChevronDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Conversation } from '../types';
 
 interface SidebarProps {
@@ -14,8 +14,6 @@ interface SidebarProps {
   onCloseSidebar: () => void;
   isFolded?: boolean;
   onToggleFold?: () => void;
-  onOpenStudyMode?: () => void;
-  onGenerateSummary?: (conversationId: string) => void;
 }
 
 export function Sidebar({
@@ -30,8 +28,6 @@ export function Sidebar({
   onCloseSidebar,
   isFolded = false,
   onToggleFold,
-  onOpenStudyMode,
-  onGenerateSummary,
 }: SidebarProps) {
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
 
@@ -136,26 +132,6 @@ export function Sidebar({
                 </div>
               )}
             </div>
-            
-            {currentConversationId && (
-              <>
-                <button
-                  onClick={onOpenStudyMode}
-                  className="w-full flex items-center gap-2 px-3 py-2 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-lg transition-colors text-purple-700 dark:text-purple-200 border border-purple-300 dark:border-purple-700 shadow-sm font-semibold mt-2"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Study Mode
-                </button>
-                
-                <button
-                  onClick={() => onGenerateSummary && onGenerateSummary(currentConversationId)}
-                  className="w-full flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 rounded-lg transition-colors text-green-700 dark:text-green-200 border border-green-300 dark:border-green-700 shadow-sm font-semibold mt-2"
-                >
-                  <FileText className="w-4 h-4" />
-                  Generate Summary
-                </button>
-              </>
-            )}
           </>
         )}
         
@@ -176,24 +152,6 @@ export function Sidebar({
             >
               <Settings className="w-4 h-4" />
             </button>
-            {currentConversationId && (
-              <>
-                <button
-                  onClick={onOpenStudyMode}
-                  className="w-full flex items-center justify-center p-2 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-lg transition-colors text-purple-700 dark:text-purple-200 border border-purple-300 dark:border-purple-700 shadow-sm"
-                  title="Study Mode"
-                >
-                  <BookOpen className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => onGenerateSummary && onGenerateSummary(currentConversationId)}
-                  className="w-full flex items-center justify-center p-2 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 rounded-lg transition-colors text-green-700 dark:text-green-200 border border-green-300 dark:border-green-700 shadow-sm"
-                  title="Generate Summary"
-                >
-                  <FileText className="w-4 h-4" />
-                </button>
-              </>
-            )}
           </div>
         )}
       </div>
@@ -226,18 +184,6 @@ export function Sidebar({
                       <span className="flex-1 text-sm font-semibold text-[var(--color-text-primary)] truncate">
                         {conversation.title}
                       </span>
-                      {conversation.summary && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            alert(conversation.summary);
-                          }}
-                          className="text-gray-400 hover:text-gray-600 transition-colors"
-                          title="View summary"
-                        >
-                          <FileText className="w-4 h-4" />
-                        </button>
-                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
