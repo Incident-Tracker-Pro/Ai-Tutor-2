@@ -169,7 +169,7 @@ function App() {
 
   return (
     <div className="h-screen flex bg-gray-50">
-      {sidebarOpen && (
+      <div className={`md:block ${sidebarOpen ? '' : 'sidebar-folded'}`}>
         <Sidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -180,11 +180,11 @@ function App() {
           settings={settings}
           onModelChange={handleModelChange}
         />
-      )}
+      </div>
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 p-2 bg-gray-800 rounded-lg z-50"
+          className="fixed top-4 left-4 p-2 bg-gray-800 rounded-lg z-50 shadow-md"
         >
           <Menu className="w-5 h-5 text-white" />
         </button>
