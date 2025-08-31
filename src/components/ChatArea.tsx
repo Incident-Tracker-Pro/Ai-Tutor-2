@@ -26,14 +26,14 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
   const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+    <div className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900">
       {allMessages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Bot className="w-8 h-8 text-blue-600" />
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-2xl font-semibold text-black dark:text-white mb-3">
               How can I help you today?
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
