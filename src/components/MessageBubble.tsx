@@ -5,11 +5,12 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { User, Bot, Copy, Check } from 'lucide-react';
 import { Message } from '../types';
+import { formatDate } from '../utils/helpers';
 
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
-  model?: 'google' | 'zhipu'; // Add model prop
+  model?: 'google' | 'zhipu';
 }
 
 export function MessageBubble({ message, isStreaming = false, model }: MessageBubbleProps) {
@@ -23,16 +24,22 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
   };
 
   return (
-    <div className={`flex gap-3 mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div
+      className={`flex gap-3 mb-6 ${isUser ? 'justify-end' : 'justify-start'} group transition-transform duration-200 hover:-translate-y-0.5`}
+    >
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-200">
-          <Bot className="w-4 h-4 text-gray-600" />
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+          <Bot className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
       <div
-        className={`max-w-[80%] p-3 rounded-lg ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800 font-normal'}`}
+        className={`max-w-[80%] p-4 rounded-xl shadow-sm transition-shadow duration-200 hover:shadow-md ${
+          isUser
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-normal'
+        }`}
       >
-        <div className="prose prose-sm max-w-none">
+        <div className="prose prose-sm max-w-none leading-relaxed">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -49,7 +56,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
-                  <code className="bg-gray-200 px-1.5 py-0.5 rounded text-sm" {...props}>
+                  <code className="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm" {...props}>
                     {children}
                   </code>
                 );
@@ -57,31 +64,48 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
               table({ children }) {
                 return (
                   <div className="overflow-x-auto my-4">
-                    <table className="border-collapse border border-gray-300 w-full">{children}</table>
+                    <table className="border-collapse border border-gray-300 dark:border-gray-600 w-full">
+                      {children}
+                    </table>
                   </div>
                 );
               },
               th({ children }) {
-                return <th className="border border-gray-300 p-2 bg-gray-100">{children}</th>;
+                return (
+                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-700 font-medium">
+                    {children}
+                  </th>
+                );
               },
               td({ children }) {
-                return <td className="border border-gray-300 p-2">{children}</td>;
+                return <td className="border border-gray-300 dark:border-gray-600 p-2">{children}</td>;
               },
             }}
           >
             {message.content}
           </ReactMarkdown>
-          {isStreaming && <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1"></span>}
+          {isStreaming && (
+            <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1"></span>
+          )}
         </div>
-        {!isUser && model && (
-          <div className="text-xs text-gray-500 mt-1">
-            {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
-          </div>
+        <div className="flex justify-between items-center mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span>{formatDate(message.timestamp)}</span>
+          {!isUser && model && (
+            <span>{model === 'google' ? 'Google Gemini' : 'ZhipuAI'}</span>
+          )}
+        </div>
+        {!isUser && (
+          <button
+            onClick={handleCopy}
+            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-opacity"
+          >
+            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          </button>
         )}
       </div>
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-blue-500">
-          <User className="w-4 h-4 text-white" />
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-blue-500">
+          <User className="w-5 h-5 text-white" />
         </div>
       )}
     </div>
