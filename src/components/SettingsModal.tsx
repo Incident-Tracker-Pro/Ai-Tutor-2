@@ -38,6 +38,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <div className="p-6 space-y-6">
           {/* Model Selection */}
           <div>
@@ -90,12 +91,12 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                 value={localSettings.googleApiKey}
                 onChange={(e) => setLocalSettings(prev => ({ ...prev, googleApiKey: e.target.value }))}
                 placeholder="Enter your Google AI API key"
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">
               Get your API key from{' '}
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:underline">
                 Google AI Studio
               </a>
             </p>
@@ -113,12 +114,12 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                 value={localSettings.zhipuApiKey}
                 onChange={(e) => setLocalSettings(prev => ({ ...prev, zhipuApiKey: e.target.value }))}
                 placeholder="Enter your ZhipuAI API key"
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">
               Get your API key from{' '}
-              <a href="https://open.bigmodel.cn/" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+              <a href="https://open.bigmodel.cn/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:underline">
                 ZhipuAI Platform
               </a>
             </p>
@@ -135,7 +136,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed font-semibold"
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold"
             disabled={!localSettings.googleApiKey && !localSettings.zhipuApiKey}
           >
             Save Settings
