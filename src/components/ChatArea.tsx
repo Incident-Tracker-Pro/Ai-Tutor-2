@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Bot } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
@@ -14,6 +14,9 @@ interface ChatAreaProps {
 
 export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage, hasApiKey }: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [editMessageId, setEditMessageId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -21,9 +24,22 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, streamingMessage]);
+  }, [messages, streamingMessage, isTyping]);
 
   const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
+
+  const handleEdit = (messageId: string, content: string) => {
+    setEditMessageId(messageId);
+    setEditContent(content);
+  };
+
+  const handleSaveEdit = (messageId: string) => {
+    if (editContent.trim()) {
+      onSendMessage(`[EDIT:${messageId}] ${editContent}`);
+      setEditMessageId(null);
+      setEditContent('');
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full bg-white">
@@ -56,8 +72,19 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
                 key={message.id}
                 message={message}
                 isStreaming={streamingMessage?.id === message.id}
+                isTyping={isTyping}
+                onEdit={handleEdit}
+                editMessageId={editMessageId}
+                editContent={editContent}
+                onSaveEdit={handleSaveEdit}
               />
             ))}
+            {isTyping && (
+              <div className="flex items-center gap-2 text-gray-500 mt-2">
+                <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></span>
+                <span>Typing...</span>
+              </div>
+            )}
           </div>
           <div ref={messagesEndRef} />
         </div>
@@ -68,6 +95,7 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
             onSendMessage={onSendMessage}
             isLoading={isLoading}
             disabled={!hasApiKey}
+            onTyping={(typing) => setIsTyping(typing)}
           />
         </div>
       </div>
