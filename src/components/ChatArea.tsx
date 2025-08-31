@@ -26,7 +26,7 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
   const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-white">
+    <div className="flex-1 flex flex-col h-full bg-gray-50 dark:bg-gray-700">
       {allMessages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md">
