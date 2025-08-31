@@ -3,7 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
 import { InstallPrompt } from './components/InstallPrompt';
-import { Conversation, Message, APISettings } from './types';
+import { Conversation, Message, APISettings, StudySession } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
