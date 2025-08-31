@@ -37,16 +37,24 @@ export function Sidebar({
             <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
           </div>
-          <button
-            onClick={onCloseSidebar}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 md:hidden"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={onOpenSettings}
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+            <button
+              onClick={onCloseSidebar}
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 md:hidden"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         <button
           onClick={onNewConversation}
-          className="w-full flex items-center gap-2 px-3 py-2 bg-[var(--color-card)] hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
+          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
         >
           <Plus className="w-4 h-4" />
           New chat
@@ -55,19 +63,19 @@ export function Sidebar({
         <div className="relative mt-3">
           <button
             onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
-            className="w-full flex items-center justify-between px-3 py-2 bg-[var(--color-card)] hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
+            className="w-full flex items-center justify-between px-3 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
           >
             <span>{settings.selectedModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}</span>
             <ChevronDown className="w-4 h-4" />
           </button>
           {modelDropdownOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-[var(--color-card)] rounded-lg shadow-lg border border-[var(--color-border)]">
+            <div className="absolute z-10 w-full mt-1 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-lg border border-[var(--color-border)]">
               <button
                 onClick={() => {
                   onModelChange('google');
                   setModelDropdownOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-700 dark:hover:bg-gray-600 text-[var(--color-text-primary)] transition-colors"
+                className="block w-full px-4 py-2 text-left hover:bg-gray-300 dark:hover:bg-gray-700 text-[var(--color-text-primary)] transition-colors"
               >
                 Google Gemini
               </button>
@@ -76,7 +84,7 @@ export function Sidebar({
                   onModelChange('zhipu');
                   setModelDropdownOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-700 dark:hover:bg-gray-600 text-[var(--color-text-primary)] transition-colors"
+                className="block w-full px-4 py-2 text-left hover:bg-gray-300 dark:hover:bg-gray-700 text-[var(--color-text-primary)] transition-colors"
               >
                 ZhipuAI
               </button>
@@ -99,8 +107,8 @@ export function Sidebar({
                   key={conversation.id}
                   className={`group flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
                     currentConversationId === conversation.id
-                      ? 'bg-[var(--color-card)] border-l-4 border-gray-600 dark:border-gray-400'
-                      : 'hover:bg-[var(--color-card)]'
+                      ? 'bg-gray-200 dark:bg-gray-800 border-l-4 border-gray-600 dark:border-gray-400'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-800'
                   }`}
                   onClick={() => onSelectConversation(conversation.id)}
                 >
@@ -122,16 +130,6 @@ export function Sidebar({
             </div>
           )}
         </div>
-      </div>
-
-      <div className="p-4 border-t border-[var(--color-border)]">
-        <button
-          onClick={onOpenSettings}
-          className="w-full flex items-center gap-2 px-3 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-card)] rounded-lg transition-colors shadow-sm"
-        >
-          <Settings className="w-4 h-4" />
-          Settings
-        </button>
       </div>
     </div>
   );
