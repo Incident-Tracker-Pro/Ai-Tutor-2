@@ -3,6 +3,8 @@ export interface Message {
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  isEditing?: boolean;
+  originalContent?: string;
 }
 
 export interface Conversation {
@@ -11,6 +13,7 @@ export interface Conversation {
   messages: Message[];
   createdAt: Date;
   updatedAt: Date;
+  summary?: string;
 }
 
 export interface Note {
@@ -25,6 +28,26 @@ export interface APISettings {
   googleApiKey: string;
   zhipuApiKey: string;
   selectedModel: 'google' | 'zhipu';
+}
+
+export interface StudySession {
+  id: string;
+  conversationId: string;
+  type: 'quiz' | 'flashcards' | 'practice';
+  questions: StudyQuestion[];
+  createdAt: Date;
+  completedAt?: Date;
+  score?: number;
+}
+
+export interface StudyQuestion {
+  id: string;
+  question: string;
+  answer: string;
+  options?: string[];
+  userAnswer?: string;
+  isCorrect?: boolean;
+  explanation?: string;
 }
 
 export type ModelProvider = 'google' | 'zhipu';
