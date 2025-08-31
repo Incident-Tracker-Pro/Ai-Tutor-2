@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, X, Smartphone } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 
 interface InstallPromptProps {
   onInstall: () => void;
@@ -10,8 +10,19 @@ export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50 animate-slide-up">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-          <Smartphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center overflow-hidden">
+          <img 
+            src="/robot.png" 
+            alt="AI Tutor" 
+            className="w-6 h-6 object-contain"
+            onError={(e) => {
+              // Fallback to a simple icon if robot.png fails to load
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              target.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
+          <div className="w-5 h-5 bg-blue-600 dark:bg-blue-400 rounded hidden"></div>
         </div>
         
         <div className="flex-1">
