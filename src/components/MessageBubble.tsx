@@ -31,10 +31,8 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         </div>
       )}
       <div
-        className={`relative max-w-[80%] p-4 rounded-xl ${
-          isUser
-            ? 'bg-gray-600 dark:bg-gray-500 text-white font-semibold'
-            : 'bg-gray-600 dark:bg-gray-500 text-gray-800 dark:text-gray-200'
+        className={`relative max-w-[80%] p-4 rounded-xl bg-gray-600 dark:bg-gray-500 ${
+          isUser ? 'text-black dark:text-white font-semibold' : 'text-black dark:text-white'
         }`}
       >
         {!isUser && model && (
