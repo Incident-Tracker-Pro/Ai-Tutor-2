@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -22,6 +22,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
@@ -46,6 +47,21 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarOpen &&
+        window.innerWidth < 768 &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setSidebarOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [sidebarOpen]);
+
   const handleModelChange = (model: 'google' | 'zhipu') => {
     const newSettings = { ...settings, selectedModel: model };
     setSettings(newSettings);
@@ -66,10 +82,16 @@ function App() {
     };
     setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   };
 
   const handleSelectConversation = (id: string) => {
     setCurrentConversationId(id);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   };
 
   const handleDeleteConversation = (id: string) => {
@@ -77,6 +99,9 @@ function App() {
     if (currentConversationId === id) {
       const remaining = conversations.filter(c => c.id !== id);
       setCurrentConversationId(remaining.length > 0 ? remaining[0].id : null);
+    }
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
     }
   };
 
@@ -168,8 +193,8 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-50">
-      <div className={`md:block ${sidebarOpen ? '' : 'sidebar-folded'}`}>
+    <div className="min-h-screen flex bg-gray-50">
+      <div ref={sidebarRef} className={`md:block ${sidebarOpen ? '' : 'sidebar-folded'}`}>
         <Sidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -179,6 +204,7 @@ function App() {
           onOpenSettings={() => setIsSettingsOpen(true)}
           settings={settings}
           onModelChange={handleModelChange}
+          onCloseSidebar={() => setSidebarOpen(false)}
         />
       </div>
       {!sidebarOpen && (
