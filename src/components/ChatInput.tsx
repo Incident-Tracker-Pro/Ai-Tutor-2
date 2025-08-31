@@ -44,6 +44,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
           disabled={disabled || isLoading}
           className="w-full min-h-[52px] max-h-[120px] p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 font-semibold"
+          style={{ color: 'black', color: 'white' }}
           rows={1}
         />
         <button
