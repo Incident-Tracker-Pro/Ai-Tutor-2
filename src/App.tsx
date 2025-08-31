@@ -171,6 +171,7 @@ function App() {
         content: '',
         role: 'assistant',
         timestamp: new Date(),
+        model: settings.selectedModel, // Store the current model when creating the message
       };
 
       setStreamingMessage(assistantMessage);
@@ -234,11 +235,15 @@ function App() {
     if (!currentConversation) return;
     
     const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
-    if (messageIndex <= 0) return;
+    if (messageIndex <= 0) return; // Can't regenerate if it's not an assistant message or first message
     
+    // Find the user message that prompted this assistant response
     const userMessage = currentConversation.messages[messageIndex - 1];
+    
+    // Remove the assistant message (and any messages after it)
     const updatedMessages = currentConversation.messages.slice(0, messageIndex);
     
+    // Update the conversation to remove the assistant response
     setConversations(prev => prev.map(conv => {
       if (conv.id === currentConversationId) {
         return {
@@ -250,7 +255,53 @@ function App() {
       return conv;
     }));
     
-    await handleSendMessage(userMessage.content);
+    // Generate new response
+    setIsLoading(true);
+    try {
+      const assistantMessage: Message = {
+        id: generateId(),
+        content: '',
+        role: 'assistant',
+        timestamp: new Date(),
+        model: settings.selectedModel, // Use current model for regeneration
+      };
+
+      setStreamingMessage(assistantMessage);
+
+      const messages = updatedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      }));
+
+      let fullResponse = '';
+      for await (const chunk of aiService.generateStreamingResponse(messages)) {
+        fullResponse += chunk;
+        setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
+      }
+
+      const finalAssistantMessage: Message = {
+        ...assistantMessage,
+        content: fullResponse,
+      };
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === currentConversationId) {
+          return {
+            ...conv,
+            messages: [...updatedMessages, finalAssistantMessage],
+            updatedAt: new Date(),
+          };
+        }
+        return conv;
+      }));
+
+      setStreamingMessage(null);
+    } catch (error) {
+      console.error('Error regenerating response:', error);
+      setStreamingMessage(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
