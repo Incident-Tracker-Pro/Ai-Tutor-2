@@ -31,7 +31,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         </div>
       )}
       <div
-        className={`relative max-w-[80%] p-4 rounded-xl ${isUser ? 'bg-blue-500 text-white dark:text-white' : 'bg-gray-100 dark:bg-gray-700 text-black dark:text-white'}`}>
+        className={`relative max-w-[80%] p-4 rounded-xl ${isUser ? 'bg-blue-500 text-white dark:text-white' : 'bg-white dark:bg-gray-700 text-black dark:text-white'}`}>
         {!isUser && model && (
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
             {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
