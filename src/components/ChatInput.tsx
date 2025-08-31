@@ -34,7 +34,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
   }, [input]);
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700">
+    <div className="p-4 bg-gray-200 dark:bg-gray-800 rounded-xl">
       <form onSubmit={handleSubmit} className="relative">
         <textarea
           ref={textareaRef}
@@ -43,7 +43,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           onKeyDown={handleKeyDown}
           placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
           disabled={disabled || isLoading}
-          className="w-full min-h-[52px] max-h-[120px] p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+          className="w-full min-h-[52px] max-h-[120px] p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 font-semibold"
           rows={1}
         />
         <button
