@@ -31,8 +31,8 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         </div>
       )}
       <div
-        className={`relative max-w-[80%] p-4 rounded-xl bg-gray-600 dark:bg-gray-500 ${
-          isUser ? 'text-black dark:text-white font-semibold' : 'text-black dark:text-white'
+        className={`relative max-w-[80%] p-4 rounded-xl bg-gray-600 dark:bg-gray-500 text-black dark:text-black ${
+          isUser ? 'font-semibold' : ''
         }`}
       >
         {!isUser && model && (
@@ -57,7 +57,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
-                  <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
+                  <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm text-black dark:text-black" {...props}>
                     {children}
                   </code>
                 );
@@ -73,13 +73,13 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
               },
               th({ children }) {
                 return (
-                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium">
+                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium text-black dark:text-black">
                     {children}
                   </th>
                 );
               },
               td({ children }) {
-                return <td className="border border-gray-300 dark:border-gray-600 p-2">{children}</td>;
+                return <td className="border border-gray-300 dark:border-gray-600 p-2 text-black dark:text-black">{children}</td>;
               },
             }}
           >
