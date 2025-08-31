@@ -33,15 +33,15 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Bot className="w-8 h-8 text-blue-600" />
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-2xl font-semibold text-black dark:text-black mb-3">
               How can I help you today?
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-gray-600 dark:text-black mb-6">
               I'm your AI tutor, ready to help you learn and answer any questions you might have.
             </p>
             {!hasApiKey && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
-                <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                <p className="text-sm text-yellow-800 dark:text-black">
                   <strong>Setup Required:</strong> Please configure your API keys in Settings to start chatting.
                 </p>
               </div>
