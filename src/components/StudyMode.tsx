@@ -116,7 +116,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
               <ArrowLeft className="w-5 h-5" />
             </button>
           </div>
-
           <div className="p-6">
             <div className="grid gap-4">
               {studyTypes.map(type => (
@@ -168,7 +167,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Quiz Complete!</h2>
                 <p className="text-gray-600">{correctCount} out of {totalCount} correct</p>
               </div>
-
               <div className="space-y-4 mb-6">
                 {studySession.questions.map((question, index) => (
                   <div key={question.id} className="border rounded-lg p-4">
@@ -192,7 +190,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                   </div>
                 ))}
               </div>
-
               <div className="flex gap-3">
                 <button onClick={handleRestart} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                   <RotateCcw className="w-4 h-4" />
@@ -218,7 +215,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </div>
-
             <div className="mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Question {currentQuestionIndex + 1} of {studySession.questions.length}</span>
@@ -228,7 +224,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                 <div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${progress}%` }}></div>
               </div>
             </div>
-
             <div className="mb-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">{currentQuestion.question}</h3>
               <div className="space-y-2">
@@ -247,7 +242,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                 ))}
               </div>
             </div>
-
             <div className="flex justify-between">
               <button
                 onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
@@ -296,13 +290,11 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </div>
-
             <div className="mb-6">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Card {currentQuestionIndex + 1} of {studySession.questions.length}</span>
               </div>
             </div>
-
             <div
               onClick={() => handleFlipCard(currentQuestion.id)}
               className="min-h-[200px] bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 cursor-pointer hover:shadow-md transition-all mb-6 flex items-center justify-center text-center"
@@ -323,7 +315,6 @@ export function StudyMode({ conversationId, conversationTitle, onClose, onGenera
                 )}
               </div>
             </div>
-
             <div className="flex justify-between">
               <button
                 onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
