@@ -3,8 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
 import { InstallPrompt } from './components/InstallPrompt';
-import { StudyMode } from './components/StudyMode';
-import { Conversation, Message, APISettings, StudySession } from './types';
+import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
@@ -26,8 +25,6 @@ function App() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
-  const [studyModeOpen, setStudyModeOpen] = useState(false);
-  const [currentStudyConversationId, setCurrentStudyConversationId] = useState<string | null>(null);
   
   // PWA hooks
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
@@ -256,39 +253,6 @@ function App() {
     await handleSendMessage(userMessage.content);
   };
 
-  const handleGenerateStudySession = async (conversationId: string, type: 'quiz' | 'flashcards' | 'practice') => {
-    const conversation = conversations.find(c => c.id === conversationId);
-    if (!conversation) throw new Error('Conversation not found');
-    
-    const messages = conversation.messages.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
-    
-    return await aiService.generateStudySession(messages, type);
-  };
-
-  const handleGenerateSummary = async (conversationId: string) => {
-    const conversation = conversations.find(c => c.id === conversationId);
-    if (!conversation) return;
-    
-    const messages = conversation.messages.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
-    
-    try {
-      const summary = await aiService.generateSummary(messages);
-      setConversations(prev => prev.map(conv => 
-        conv.id === conversationId 
-          ? { ...conv, summary, updatedAt: new Date() }
-          : conv
-      ));
-    } catch (error) {
-      console.error('Error generating summary:', error);
-    }
-  };
-
   return (
     <div className="h-screen flex bg-gray-50 dark:bg-gray-900">
       {sidebarOpen && (
@@ -304,11 +268,6 @@ function App() {
           onCloseSidebar={() => setSidebarOpen(false)}
           isFolded={sidebarFolded}
           onToggleFold={handleToggleSidebarFold}
-          onOpenStudyMode={() => {
-            setCurrentStudyConversationId(currentConversationId);
-            setStudyModeOpen(true);
-          }}
-          onGenerateSummary={handleGenerateSummary}
         />
       )}
       
@@ -345,16 +304,6 @@ function App() {
         <InstallPrompt
           onInstall={handleInstallApp}
           onDismiss={dismissInstallPrompt}
-        />
-      )}
-      
-      {/* Study Mode */}
-      {studyModeOpen && currentStudyConversationId && (
-        <StudyMode
-          conversationId={currentStudyConversationId}
-          conversationTitle={conversations.find(c => c.id === currentStudyConversationId)?.title || ''}
-          onClose={() => setStudyModeOpen(false)}
-          onGenerateStudySession={handleGenerateStudySession}
         />
       )}
     </div>
