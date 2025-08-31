@@ -24,6 +24,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+  const [sidebarFolded, setSidebarFolded] = useState(false);
 
   // PWA hooks
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
@@ -37,6 +38,12 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
     aiService.updateSettings(savedSettings);
+
+    // Load sidebar folded state from localStorage
+    const savedSidebarFolded = localStorage.getItem('ai-tutor-sidebar-folded');
+    if (savedSidebarFolded) {
+      setSidebarFolded(JSON.parse(savedSidebarFolded));
+    }
   }, []);
 
   useEffect(() => {
@@ -51,11 +58,20 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Save sidebar folded state to localStorage
+  useEffect(() => {
+    localStorage.setItem('ai-tutor-sidebar-folded', JSON.stringify(sidebarFolded));
+  }, [sidebarFolded]);
+
   const handleModelChange = (model: 'google' | 'zhipu') => {
     const newSettings = { ...settings, selectedModel: model };
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
     aiService.updateSettings(newSettings);
+  };
+
+  const handleToggleSidebarFold = () => {
+    setSidebarFolded(!sidebarFolded);
   };
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
@@ -211,13 +227,16 @@ function App() {
           settings={settings}
           onModelChange={handleModelChange}
           onCloseSidebar={() => setSidebarOpen(false)}
+          isFolded={sidebarFolded}
+          onToggleFold={handleToggleSidebarFold}
         />
       )}
 
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 p-2 bg-gray-600 dark:bg-gray-700 rounded-lg z-50 shadow-md"
+          className="fixed top-4 left-4 p-2 bg-gray-600 dark:bg-gray-700 rounded-lg z-50 shadow-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+          title="Open sidebar"
         >
           <Menu className="w-5 h-5 text-white" />
         </button>
