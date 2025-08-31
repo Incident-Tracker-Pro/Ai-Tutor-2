@@ -28,8 +28,8 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">API Settings</h2>
+            <Settings className="w-5 h-5 text-black" />
+            <h2 className="text-lg font-semibold text-black">API Settings</h2>
           </div>
           <button
             onClick={onClose}
@@ -40,7 +40,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
         </div>
         <div className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-black mb-3">
               Select AI Model
             </label>
             <div className="space-y-2">
@@ -55,7 +55,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                 />
                 <Bot className="w-4 h-4 text-blue-600" />
                 <div>
-                  <div className="font-medium text-gray-900">Google Gemini</div>
+                  <div className="font-semibold text-black">Google Gemini</div>
                   <div className="text-sm text-gray-500">Gemma-3-27b-it</div>
                 </div>
               </label>
@@ -70,14 +70,14 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                 />
                 <Bot className="w-4 h-4 text-purple-600" />
                 <div>
-                  <div className="font-medium text-gray-900">ZhipuAI</div>
+                  <div className="font-semibold text-black">ZhipuAI</div>
                   <div className="text-sm text-gray-500">GLM-4.5-Flash</div>
                 </div>
               </label>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-black mb-2">
               Google AI API Key
             </label>
             <div className="relative">
@@ -98,7 +98,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-black mb-2">
               ZhipuAI API Key
             </label>
             <div className="relative">
@@ -122,13 +122,13 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
         <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-semibold"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed font-semibold"
             disabled={!localSettings.googleApiKey && !localSettings.zhipuApiKey}
           >
             Save Settings
