@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
+import { InstallPrompt } from './components/InstallPrompt';
 import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
+import { usePWA } from './hooks/usePWA';
 import { Menu } from 'lucide-react';
 
 const defaultSettings: APISettings = {
@@ -22,6 +24,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+
+  // PWA hooks
+  const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
@@ -95,11 +100,19 @@ function App() {
     aiService.updateSettings(newSettings);
   };
 
+  const handleInstallApp = async () => {
+    const success = await installApp();
+    if (success) {
+      console.log('App installed successfully');
+    }
+  };
+
   const handleSendMessage = async (content: string) => {
     if (!hasApiKey) {
       setIsSettingsOpen(true);
       return;
     }
+
     let targetConversationId = currentConversationId;
     if (!targetConversationId) {
       const newConversation: Conversation = {
@@ -113,12 +126,14 @@ function App() {
       targetConversationId = newConversation.id;
       setCurrentConversationId(targetConversationId);
     }
+
     const userMessage: Message = {
       id: generateId(),
       content,
       role: 'user',
       timestamp: new Date(),
     };
+
     setConversations(prev => prev.map(conv => {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
@@ -132,6 +147,7 @@ function App() {
       }
       return conv;
     }));
+
     setIsLoading(true);
     try {
       const assistantMessage: Message = {
@@ -141,22 +157,27 @@ function App() {
         timestamp: new Date(),
       };
       setStreamingMessage(assistantMessage);
+
       const conversationHistory = currentConversation
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
+
       const messages = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content,
       }));
+
       let fullResponse = '';
       for await (const chunk of aiService.generateStreamingResponse(messages)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
+
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
       };
+
       setConversations(prev => prev.map(conv => {
         if (conv.id === targetConversationId) {
           return {
@@ -167,6 +188,7 @@ function App() {
         }
         return conv;
       }));
+
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -191,6 +213,7 @@ function App() {
           onCloseSidebar={() => setSidebarOpen(false)}
         />
       )}
+
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
@@ -199,6 +222,7 @@ function App() {
           <Menu className="w-5 h-5 text-white" />
         </button>
       )}
+
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
@@ -206,12 +230,21 @@ function App() {
         streamingMessage={streamingMessage}
         hasApiKey={hasApiKey}
       />
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onSaveSettings={handleSaveSettings}
       />
+
+      {/* PWA Install Prompt */}
+      {isInstallable && !isInstalled && (
+        <InstallPrompt
+          onInstall={handleInstallApp}
+          onDismiss={dismissInstallPrompt}
+        />
+      )}
     </div>
   );
 }
