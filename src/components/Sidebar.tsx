@@ -26,7 +26,9 @@ export function Sidebar({
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
 
   return (
-    <div className="w-64 bg-[var(--color-sidebar)] flex flex-col h-full border-r border-[var(--color-border)] sidebar">
+    <div
+      className="w-64 bg-[var(--color-sidebar)] flex flex-col h-full border-r border-[var(--color-border)] sidebar transition-transform duration-300 ease-in-out fixed md:static z-50"
+    >
       <div className="p-4 border-b border-[var(--color-border)]">
         <div className="flex items-center gap-2 mb-4">
           <Bot className="w-6 h-6 text-[var(--color-accent)]" />
@@ -34,17 +36,17 @@ export function Sidebar({
         </div>
         <button
           onClick={onNewConversation}
-          className="w-full flex items-center gap-2 px-3 py-2 bg-[var(--color-card)] hover:bg-gray-800 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)]"
+          className="w-full flex items-center gap-2 px-3 py-2 bg-[var(--color-card)] hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
         >
           <Plus className="w-4 h-4" />
           New chat
         </button>
 
         {/* Model Selection Dropdown */}
-        <div className="relative mt-2">
+        <div className="relative mt-3">
           <button
             onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
-            className="w-full flex items-center justify-between px-3 py-2 bg-[var(--color-card)] hover:bg-gray-800 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)]"
+            className="w-full flex items-center justify-between px-3 py-2 bg-[var(--color-card)] hover:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
           >
             <span>{settings.selectedModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}</span>
             <ChevronDown className="w-4 h-4" />
@@ -56,7 +58,7 @@ export function Sidebar({
                   onModelChange('google');
                   setModelDropdownOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-700"
+                className="block w-full px-4 py-2 text-left hover:bg-gray-700 dark:hover:bg-gray-600 text-[var(--color-text-primary)] transition-colors"
               >
                 Google Gemini
               </button>
@@ -65,7 +67,7 @@ export function Sidebar({
                   onModelChange('zhipu');
                   setModelDropdownOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-700"
+                className="block w-full px-4 py-2 text-left hover:bg-gray-700 dark:hover:bg-gray-600 text-[var(--color-text-primary)] transition-colors"
               >
                 ZhipuAI
               </button>
@@ -74,7 +76,6 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* Rest of the Sidebar code remains the same */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
           {conversations.length === 0 ? (
@@ -87,9 +88,9 @@ export function Sidebar({
               {conversations.map((conversation) => (
                 <div
                   key={conversation.id}
-                  className={`group flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                  className={`group flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
                     currentConversationId === conversation.id
-                      ? 'bg-[var(--color-card)] border-l-2 border-[var(--color-accent)]'
+                      ? 'bg-[var(--color-card)] border-l-4 border-[var(--color-accent)]'
                       : 'hover:bg-[var(--color-card)]'
                   }`}
                   onClick={() => onSelectConversation(conversation.id)}
@@ -117,7 +118,7 @@ export function Sidebar({
       <div className="p-4 border-t border-[var(--color-border)]">
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center gap-2 px-3 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-card)] rounded-lg transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-card)] rounded-lg transition-colors shadow-sm"
         >
           <Settings className="w-4 h-4" />
           Settings
