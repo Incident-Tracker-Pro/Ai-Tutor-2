@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -22,7 +22,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
-  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
@@ -46,21 +45,6 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        sidebarOpen &&
-        window.innerWidth < 768 &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target as Node)
-      ) {
-        setSidebarOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [sidebarOpen]);
 
   const handleModelChange = (model: 'google' | 'zhipu') => {
     const newSettings = { ...settings, selectedModel: model };
@@ -193,8 +177,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <div ref={sidebarRef} className={`md:block ${sidebarOpen ? '' : 'sidebar-folded'}`}>
+    <div className="h-screen flex bg-gray-50 dark:bg-gray-900">
+      {sidebarOpen && (
         <Sidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -206,11 +190,11 @@ function App() {
           onModelChange={handleModelChange}
           onCloseSidebar={() => setSidebarOpen(false)}
         />
-      </div>
+      )}
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 p-2 bg-gray-800 rounded-lg z-50 shadow-md"
+          className="fixed top-4 left-4 p-2 bg-gray-600 dark:bg-gray-700 rounded-lg z-50 shadow-md"
         >
           <Menu className="w-5 h-5 text-white" />
         </button>
