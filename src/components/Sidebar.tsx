@@ -35,7 +35,7 @@ export function Sidebar({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-            <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
+            <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
           </div>
           <div className="flex gap-2">
             <button
@@ -54,7 +54,7 @@ export function Sidebar({
         </div>
         <button
           onClick={onNewConversation}
-          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
+          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm text-base"
         >
           <Plus className="w-4 h-4" />
           New chat
@@ -62,7 +62,7 @@ export function Sidebar({
         <div className="relative mt-3">
           <button
             onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
-            className="w-full flex items-center justify-between px-3 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
+            className="w-full flex items-center justify-between px-3 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm text-base"
           >
             <span>{settings.selectedModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}</span>
             <ChevronDown className="w-4 h-4" />
@@ -74,7 +74,7 @@ export function Sidebar({
                   onModelChange('google');
                   setModelDropdownOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-300 dark:hover:bg-gray-700 text-[var(--color-text-primary)] transition-colors"
+                className="block w-full px-4 py-2 text-left hover:bg-gray-300 dark:hover:bg-gray-700 text-[var(--color-text-primary)] transition-colors text-base"
               >
                 Google Gemini
               </button>
@@ -83,7 +83,7 @@ export function Sidebar({
                   onModelChange('zhipu');
                   setModelDropdownOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-300 dark:hover:bg-gray-700 text-[var(--color-text-primary)] transition-colors"
+                className="block w-full px-4 py-2 text-left hover:bg-gray-300 dark:hover:bg-gray-700 text-[var(--color-text-primary)] transition-colors text-base"
               >
                 ZhipuAI
               </button>
@@ -96,7 +96,7 @@ export function Sidebar({
           {conversations.length === 0 ? (
             <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
               <MessageSquare className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-secondary)]" />
-              <p className="text-sm">No conversations yet</p>
+              <p className="text-base">No conversations yet</p>
             </div>
           ) : (
             <div className="space-y-1">
@@ -111,7 +111,7 @@ export function Sidebar({
                   onClick={() => onSelectConversation(conversation.id)}
                 >
                   <MessageSquare className="w-4 h-4 flex-shrink-0 text-[var(--color-text-secondary)]" />
-                  <span className="flex-1 text-sm text-[var(--color-text-primary)] truncate">
+                  <span className="flex-1 text-base text-[var(--color-text-primary)] truncate">
                     {conversation.title}
                   </span>
                   <button
