@@ -24,22 +24,20 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
   };
 
   return (
-    <div
-      className={`flex gap-3 mb-6 ${isUser ? 'justify-end' : 'justify-start'} group transition-transform duration-200 hover:-translate-y-0.5`}
-    >
+    <div className={`flex gap-3 mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
           <Bot className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
       <div
-        className={`max-w-[80%] p-4 rounded-xl shadow-sm transition-shadow duration-200 hover:shadow-md ${
+        className={`max-w-[80%] p-4 rounded-xl ${
           isUser
             ? 'bg-blue-500 text-white'
-            : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-normal'
+            : 'bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
         }`}
       >
-        <div className="prose prose-sm max-w-none leading-relaxed">
+        <div className="prose prose-base max-w-none leading-relaxed">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -56,7 +54,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
-                  <code className="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm" {...props}>
+                  <code className="bg-gray-200 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
                     {children}
                   </code>
                 );
@@ -72,7 +70,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
               },
               th({ children }) {
                 return (
-                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-700 font-medium">
+                  <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium">
                     {children}
                   </th>
                 );
@@ -88,7 +86,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
             <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1"></span>
           )}
         </div>
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex justify-between items-center mt-2 text-xs text-gray-400 dark:text-gray-500">
           <span>{formatDate(message.timestamp)}</span>
           {!isUser && model && (
             <span>{model === 'google' ? 'Google Gemini' : 'ZhipuAI'}</span>
@@ -97,7 +95,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         {!isUser && (
           <button
             onClick={handleCopy}
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-opacity"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
