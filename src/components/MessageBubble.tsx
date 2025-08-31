@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { User, Bot, Copy, Check } from 'lucide-react';
+import { Smile, Sparkles, Copy, Check } from 'lucide-react';
 import { Message } from '../types';
 
 interface MessageBubbleProps {
@@ -26,7 +26,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
     <div className={`flex gap-3 mb-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-          <Bot className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
       <div
@@ -100,7 +100,7 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
       </div>
       {isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
-          <User className="w-5 h-5 text-white" />
+          <Smile className="w-5 h-5 text-white" />
         </div>
       )}
     </div>
