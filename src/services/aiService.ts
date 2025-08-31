@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { APISettings, StudySession } from '../types';
-import { generateId } from '../utils/helpers';
+import { APISettings } from '../types';
 
 class AIService {
   private googleAI: GoogleGenerativeAI | null = null;
@@ -206,63 +205,6 @@ class AIService {
       fullResponse += chunk;
     }
     return fullResponse;
-  }
-
-  async generateStudySession(
-    messages: Array<{ role: string; content: string }>,
-    type: 'quiz' | 'flashcards' | 'practice'
-  ): Promise<StudySession> {
-    const systemPrompt = `
-      You are an AI tutor creating study materials. Based on the conversation, generate a ${type} session.
-      For quiz: Create 5 multiple choice questions with 4 options each, and provide the correct answer and explanation.
-      For flashcards: Create 5 question-answer pairs for key concepts.
-      For practice: Create 5 practice problems with detailed solutions.
-      
-      Return your response as a JSON object with a "questions" array.
-    `;
-    
-    const fullMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-      { role: 'user', content: `Generate a ${type} study session based on our conversation.` }
-    ];
-    
-    const response = await this.generateResponse(fullMessages);
-    
-    try {
-      // Extract JSON from the response
-      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
-                       response.match(/{[\s\S]*}/);
-      
-      if (!jsonMatch) throw new Error('No valid JSON found');
-      
-      const jsonData = JSON.parse(jsonMatch[1] || jsonMatch[0]);
-      
-      return {
-        id: generateId(),
-        conversationId: 'current',
-        type,
-        questions: jsonData.questions,
-        createdAt: new Date(),
-      };
-    } catch (error) {
-      console.error('Error parsing study session:', error);
-      throw new Error('Failed to generate study session');
-    }
-  }
-
-  async generateSummary(messages: Array<{ role: string; content: string }>): Promise<string> {
-    const systemPrompt = `
-      Summarize the following conversation in a concise paragraph (max 100 words).
-      Capture the main topics discussed and key points.
-    `;
-    
-    const fullMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-    ];
-    
-    return await this.generateResponse(fullMessages);
   }
 }
 
