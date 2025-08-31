@@ -34,7 +34,7 @@ export function Sidebar({
       <div className="p-4 border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Bot className="w-6 h-6 text-[var(--color-accent)]" />
+            <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
           </div>
           <button
@@ -99,7 +99,7 @@ export function Sidebar({
                   key={conversation.id}
                   className={`group flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
                     currentConversationId === conversation.id
-                      ? 'bg-[var(--color-card)] border-l-4 border-[var(--color-accent)]'
+                      ? 'bg-[var(--color-card)] border-l-4 border-gray-600 dark:border-gray-400'
                       : 'hover:bg-[var(--color-card)]'
                   }`}
                   onClick={() => onSelectConversation(conversation.id)}
