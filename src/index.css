@@ -12,7 +12,7 @@
     --color-text-secondary: #9CA3AF;
     --color-text-placeholder: #6B7280;
     --color-accent: #3B82F6;
-    --font-weight: 400; /* Changed from 500 to 400 */
+    --font-weight: 400;
   }
 
   .light-theme {
