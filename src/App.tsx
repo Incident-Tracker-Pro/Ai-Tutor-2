@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
 import { InstallPrompt } from './components/InstallPrompt';
+import { StudyMode } from './components/StudyMode';
 import { Conversation, Message, APISettings, StudySession } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
@@ -25,7 +26,9 @@ function App() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
-
+  const [studyModeOpen, setStudyModeOpen] = useState(false);
+  const [currentStudyConversationId, setCurrentStudyConversationId] = useState<string | null>(null);
+  
   // PWA hooks
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
@@ -38,7 +41,7 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
     aiService.updateSettings(savedSettings);
-
+    
     // Load sidebar folded state from localStorage
     const savedSidebarFolded = localStorage.getItem('ai-tutor-sidebar-folded');
     if (savedSidebarFolded) {
@@ -128,7 +131,7 @@ function App() {
       setIsSettingsOpen(true);
       return;
     }
-
+    
     let targetConversationId = currentConversationId;
     if (!targetConversationId) {
       const newConversation: Conversation = {
@@ -172,6 +175,7 @@ function App() {
         role: 'assistant',
         timestamp: new Date(),
       };
+
       setStreamingMessage(assistantMessage);
 
       const conversationHistory = currentConversation
@@ -214,6 +218,77 @@ function App() {
     }
   };
 
+  const handleEditMessage = (messageId: string, newContent: string) => {
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === currentConversationId) {
+        return {
+          ...conv,
+          messages: conv.messages.map(msg => 
+            msg.id === messageId ? { ...msg, content: newContent } : msg
+          ),
+          updatedAt: new Date(),
+        };
+      }
+      return conv;
+    }));
+  };
+
+  const handleRegenerateResponse = async (messageId: string) => {
+    if (!currentConversation) return;
+    
+    const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
+    if (messageIndex <= 0) return;
+    
+    const userMessage = currentConversation.messages[messageIndex - 1];
+    const updatedMessages = currentConversation.messages.slice(0, messageIndex);
+    
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === currentConversationId) {
+        return {
+          ...conv,
+          messages: updatedMessages,
+          updatedAt: new Date(),
+        };
+      }
+      return conv;
+    }));
+    
+    await handleSendMessage(userMessage.content);
+  };
+
+  const handleGenerateStudySession = async (conversationId: string, type: 'quiz' | 'flashcards' | 'practice') => {
+    const conversation = conversations.find(c => c.id === conversationId);
+    if (!conversation) throw new Error('Conversation not found');
+    
+    const messages = conversation.messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    return await aiService.generateStudySession(messages, type);
+  };
+
+  const handleGenerateSummary = async (conversationId: string) => {
+    const conversation = conversations.find(c => c.id === conversationId);
+    if (!conversation) return;
+    
+    const messages = conversation.messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    try {
+      const summary = await aiService.generateSummary(messages);
+      setConversations(prev => prev.map(conv => 
+        conv.id === conversationId 
+          ? { ...conv, summary, updatedAt: new Date() }
+          : conv
+      ));
+    } catch (error) {
+      console.error('Error generating summary:', error);
+    }
+  };
+
   return (
     <div className="h-screen flex bg-gray-50 dark:bg-gray-900">
       {sidebarOpen && (
@@ -229,9 +304,14 @@ function App() {
           onCloseSidebar={() => setSidebarOpen(false)}
           isFolded={sidebarFolded}
           onToggleFold={handleToggleSidebarFold}
+          onOpenStudyMode={() => {
+            setCurrentStudyConversationId(currentConversationId);
+            setStudyModeOpen(true);
+          }}
+          onGenerateSummary={handleGenerateSummary}
         />
       )}
-
+      
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
@@ -241,27 +321,40 @@ function App() {
           <Menu className="w-5 h-5 text-white" />
         </button>
       )}
-
+      
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
         streamingMessage={streamingMessage}
         hasApiKey={hasApiKey}
+        model={settings.selectedModel}
+        onEditMessage={handleEditMessage}
+        onRegenerateResponse={handleRegenerateResponse}
       />
-
+      
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onSaveSettings={handleSaveSettings}
       />
-
+      
       {/* PWA Install Prompt */}
       {isInstallable && !isInstalled && (
         <InstallPrompt
           onInstall={handleInstallApp}
           onDismiss={dismissInstallPrompt}
+        />
+      )}
+      
+      {/* Study Mode */}
+      {studyModeOpen && currentStudyConversationId && (
+        <StudyMode
+          conversationId={currentStudyConversationId}
+          conversationTitle={conversations.find(c => c.id === currentStudyConversationId)?.title || ''}
+          onClose={() => setStudyModeOpen(false)}
+          onGenerateStudySession={handleGenerateStudySession}
         />
       )}
     </div>
