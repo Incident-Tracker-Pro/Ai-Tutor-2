@@ -31,13 +31,18 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         </div>
       )}
       <div
-        className={`max-w-[80%] p-4 rounded-xl ${
+        className={`relative max-w-[80%] p-4 rounded-xl ${
           isUser
-            ? 'bg-gray-600 dark:bg-gray-500 text-white'
-            : 'bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
+            ? 'bg-gray-600 dark:bg-gray-500 text-white font-semibold'
+            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'
         }`}
       >
-        <div className="prose prose-base max-w-none leading-relaxed">
+        {!isUser && model && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
+            {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
+          </div>
+        )}
+        <div className={`prose prose-base max-w-none leading-relaxed ${isUser ? 'font-semibold' : ''}`}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -88,14 +93,12 @@ export function MessageBubble({ message, isStreaming = false, model }: MessageBu
         </div>
         <div className="flex justify-between items-center mt-2 text-xs text-gray-400 dark:text-gray-500">
           <span>{formatDate(message.timestamp)}</span>
-          {!isUser && model && (
-            <span>{model === 'google' ? 'Google Gemini' : 'ZhipuAI'}</span>
-          )}
         </div>
         {!isUser && (
           <button
             onClick={handleCopy}
             className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            style={{ zIndex: 10 }}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
