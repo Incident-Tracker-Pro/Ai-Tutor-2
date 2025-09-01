@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,6 +30,37 @@
   body {
     @apply bg-[var(--color-bg)] text-[var(--color-text-primary)] font-sans font-[var(--font-weight)];
     overflow-x: hidden;
+  }
+
+  /* Enhanced Marathi/Devanagari font styling */
+  body[data-lang="mr"],
+  .marathi-text,
+  [lang="mr"] {
+    font-family: 'Noto Sans Devanagari', 'Noto Sans', system-ui, -apple-system, sans-serif;
+    font-weight: 500; /* Increased from 400 to 500 for better readability */
+    line-height: 1.7; /* Increased line height for better spacing */
+    letter-spacing: 0.01em; /* Slight letter spacing for clarity */
+  }
+
+  /* Specific weight adjustments for different Marathi text elements */
+  .marathi-text.font-semibold,
+  [lang="mr"].font-semibold {
+    font-weight: 600;
+  }
+
+  .marathi-text.font-bold,
+  [lang="mr"].font-bold {
+    font-weight: 700;
+  }
+
+  /* Better rendering for Devanagari script */
+  .marathi-text,
+  [lang="mr"] {
+    text-rendering: optimizeLegibility;
+    -webkit-font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
+    font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
