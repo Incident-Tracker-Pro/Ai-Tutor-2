@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -8,6 +9,7 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatInputProps) {
+  const { selectedLanguage } = useContext(LanguageContext);
   const [input, setInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -18,7 +20,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
     if (input.trim() && !isLoading && !disabled) {
       onSendMessage(input.trim());
       setInput('');
-      // Reset textarea height after sending
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
@@ -32,7 +33,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
     }
   }, [handleSubmit]);
 
-  // Debounced resize function for smoother textarea resizing
   const resizeTextarea = useCallback(() => {
     if (textareaRef.current) {
       if (resizeTimeoutRef.current) {
@@ -53,7 +53,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
     resizeTextarea();
   }, [input, resizeTextarea]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (resizeTimeoutRef.current) {
@@ -62,7 +61,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
     };
   }, []);
 
-  // Auto-focus on desktop when not loading
   useEffect(() => {
     if (!isLoading && !disabled && textareaRef.current && window.innerWidth >= 768) {
       textareaRef.current.focus();
@@ -85,7 +83,10 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
+              placeholder={disabled ? 
+                (selectedLanguage === 'en' ? 'Please configure API keys in Settings first...' : 'कृपया प्रथम सेटिंग्जमध्ये API की कॉन्फिगर करा...') : 
+                (selectedLanguage === 'en' ? 'Send a message...' : 'संदेश पाठवा...')
+              }
               disabled={disabled || isLoading}
               className={`w-full min-h-[52px] max-h-[120px] p-3 pr-12 border rounded-lg resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium ${
                 disabled || isLoading
@@ -98,7 +99,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
                 scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
               }}
             />
-            {/* Character count indicator */}
             {input.length > 500 && (
               <div className={`absolute bottom-2 right-16 text-xs transition-colors duration-200 ${
                 input.length > 1000 ? 'text-red-500' : 'text-gray-400'
@@ -117,7 +117,10 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
                   ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed scale-95 opacity-60'
                   : 'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
               } text-white`}
-              title={!canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)'}
+              title={selectedLanguage === 'en' ? 
+                (!canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)') :
+                (!canSend ? (disabled ? 'प्रथम API की कॉन्फिगर करा' : 'संदेश प्रविष्ट करा') : 'संदेश पाठवा (Enter)')
+              }
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -129,30 +132,41 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
         </div>
       </form>
 
-      {/* Status text */}
       <div className={`transition-all duration-200 overflow-hidden ${
         disabled || input.length > 1500 ? 'max-h-10 mt-2 opacity-100' : 'max-h-0 opacity-0'
       }`}>
         {disabled && (
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Configure your API keys in Settings to start chatting
+            {selectedLanguage === 'en'
+              ? 'Configure your API keys in Settings to start chatting'
+              : 'चॅटिंग सुरू करण्यासाठी सेटिंग्जमध्ये आपली API की कॉन्फिगर करा'}
           </p>
         )}
         {input.length > 1500 && (
           <p className={`text-xs text-center ${
             input.length > 1900 ? 'text-red-500' : input.length > 1500 ? 'text-yellow-500' : 'text-gray-500'
           }`}>
-            {input.length > 1900 ? 'Message is getting very long!' : 'Long message detected'}
+            {selectedLanguage === 'en'
+              ? (input.length > 1900 ? 'Message is getting very long!' : 'Long message detected')
+              : (input.length > 1900 ? 'संदेश खूप लांब होत आहे!' : 'लांब संदेश आढळला')}
           </p>
         )}
       </div>
 
-      {/* Keyboard shortcuts hint */}
       {isFocused && !disabled && (
         <div className="mt-2 flex justify-center">
           <p className="text-xs text-gray-400 dark:text-gray-500 transition-opacity duration-200">
-            <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> to send,
-            <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-1">Shift+Enter</kbd> for new line
+            {selectedLanguage === 'en' ? (
+              <>
+                <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> to send,
+                <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-1">Shift+Enter</kbd> for new line
+              </>
+            ) : (
+              <>
+                <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> पाठवण्यासाठी,
+                <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-1">Shift+Enter</kbd> नवीन ओळीसाठी
+              </>
+            )}
           </p>
         </div>
       )}
