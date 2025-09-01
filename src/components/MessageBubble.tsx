@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Smile, Sparkles, Copy, Check, Edit2, RefreshCcw, Save, X } from 'lucide-react';
 import { Message } from '../types';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 interface MessageBubbleProps {
   message: Message;
@@ -21,6 +22,7 @@ export function MessageBubble({
   onEditMessage,
   onRegenerateResponse
 }: MessageBubbleProps) {
+  const { selectedLanguage } = useContext(LanguageContext);
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
   const [editContent, setEditContent] = useState(message.content);
@@ -30,7 +32,6 @@ export function MessageBubble({
   const bubbleRef = useRef<HTMLDivElement>(null);
   const copyTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Use the model stored in the message for assistant messages, fallback to current model
   const displayModel = isUser ? undefined : (message.model || model);
 
   const handleCopy = useCallback(async () => {
@@ -69,7 +70,6 @@ export function MessageBubble({
     }
   }, [message.id, onRegenerateResponse]);
 
-  // Auto-resize textarea
   useEffect(() => {
     if (isEditing && textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -77,7 +77,6 @@ export function MessageBubble({
     }
   }, [isEditing, editContent]);
 
-  // Handle keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
       handleSaveEdit();
@@ -86,7 +85,6 @@ export function MessageBubble({
     }
   }, [handleSaveEdit, handleCancelEdit]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) {
@@ -95,7 +93,6 @@ export function MessageBubble({
     };
   }, []);
 
-  // Smooth entrance animation
   useEffect(() => {
     if (bubbleRef.current) {
       bubbleRef.current.style.transform = 'translateY(20px)';
@@ -130,7 +127,6 @@ export function MessageBubble({
           isUser ? 'text-black font-semibold' : 'text-black font-medium'
         }`}
       >
-        {/* Only show model name for assistant messages and use the stored model */}
         {!isUser && displayModel && (
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
             {displayModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}
@@ -145,7 +141,7 @@ export function MessageBubble({
               onChange={(e) => setEditContent(e.target.value)}
               onKeyDown={handleKeyDown}
               className="w-full min-h-[100px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black font-medium"
-              placeholder="Edit your message..."
+              placeholder={selectedLanguage === 'en' ? 'Edit your message...' : 'आपला संदेश संपादित करा...'}
             />
             <div className="flex gap-2 justify-end">
               <button
@@ -153,7 +149,7 @@ export function MessageBubble({
                 className="flex items-center gap-1 px-3 py-1.5 text-gray-600 hover:text-gray-800 transition-colors text-sm"
               >
                 <X className="w-3 h-3" />
-                Cancel
+                {selectedLanguage === 'en' ? 'Cancel' : 'रद्द करा'}
               </button>
               <button
                 onClick={handleSaveEdit}
@@ -161,11 +157,13 @@ export function MessageBubble({
                 disabled={editContent.trim() === message.content || !editContent.trim()}
               >
                 <Save className="w-3 h-3" />
-                Save
+                {selectedLanguage === 'en' ? 'Save' : 'जतन करा'}
               </button>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Press Ctrl+Enter to save, Escape to cancel
+              {selectedLanguage === 'en'
+                ? 'Press Ctrl+Enter to save, Escape to cancel'
+                : 'जतन करण्यासाठी Ctrl+Enter दाबा, रद्द करण्यासाठी Escape दाबा'}
             </p>
           </div>
         ) : (
@@ -220,35 +218,31 @@ export function MessageBubble({
           </div>
         )}
 
-        {/* Action buttons - Only show for non-editing, non-streaming messages with content */}
         {!isEditing && !isStreaming && message.content.length > 0 && (
           <div className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
-            {/* Regenerate button - Only for assistant messages */}
             {!isUser && onRegenerateResponse && (
               <button
                 onClick={handleRegenerate}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-                title="Regenerate response"
+                title={selectedLanguage === 'en' ? 'Regenerate response' : 'प्रतिसाद पुन्हा तयार करा'}
               >
                 <RefreshCcw className="w-4 h-4" />
               </button>
             )}
-            {/* Edit button - Available for all messages */}
             {onEditMessage && (
               <button
                 onClick={handleEdit}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-                title="Edit message"
+                title={selectedLanguage === 'en' ? 'Edit message' : 'संदेश संपादित करा'}
               >
                 <Edit2 className="w-4 h-4" />
               </button>
             )}
-            {/* Copy button - Only for assistant messages */}
             {!isUser && (
               <button
                 onClick={handleCopy}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-                title="Copy message"
+                title={selectedLanguage === 'en' ? 'Copy message' : 'संदेश कॉपी करा'}
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </button>
