@@ -86,7 +86,7 @@ export function Sidebar({
           <>
             <button
               onClick={onNewConversation}
-              className="w-full flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-white border border-blue-600 shadow-sm font-medium mb-3"
+              className="w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-3"
             >
               <Plus className="w-4 h-4" />
               New chat
@@ -102,7 +102,7 @@ export function Sidebar({
                   onClick={() => onModelChange('google')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                     settings.selectedModel === 'google'
-                      ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-500 text-blue-700 dark:text-blue-300'
+                      ? 'bg-green-100 dark:bg-green-900/30 border-2 border-green-500 text-green-700 dark:text-green-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border-2 border-transparent text-gray-600 dark:text-gray-300'
                   }`}
                 >
@@ -130,7 +130,7 @@ export function Sidebar({
           <div className="space-y-3">
             <button
               onClick={onNewConversation}
-              className="w-full flex items-center justify-center p-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
+              className="w-full flex items-center justify-center p-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm"
               title="New chat"
             >
               <Plus className="w-4 h-4" />
@@ -162,7 +162,7 @@ export function Sidebar({
                   key={conversation.id}
                   className={`group flex items-center gap-2 ${isFolded ? 'justify-center p-2' : 'p-3'} rounded-lg cursor-pointer transition-colors ${
                     currentConversationId === conversation.id
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+                      ? 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
                       : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                   onClick={() => onSelectConversation(conversation.id)}
