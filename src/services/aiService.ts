@@ -5,16 +5,17 @@ class AIService {
   private googleAI: GoogleGenerativeAI | null = null;
   private zhipuAI: any = null;
   private settings: APISettings | null = null;
+  private language: 'en' | 'mr' = 'en';
 
-  updateSettings(settings: APISettings) {
+  updateSettings(settings: APISettings, language: 'en' | 'mr') {
     this.settings = settings;
+    this.language = language;
     this.initializeProviders();
   }
 
   private initializeProviders() {
     if (!this.settings) return;
 
-    // Initialize Google AI
     if (this.settings.googleApiKey) {
       try {
         this.googleAI = new GoogleGenerativeAI(this.settings.googleApiKey);
@@ -23,7 +24,6 @@ class AIService {
       }
     }
 
-    // Initialize ZhipuAI
     if (this.settings.zhipuApiKey) {
       try {
         this.zhipuAI = { apiKey: this.settings.zhipuApiKey };
@@ -35,31 +35,48 @@ class AIService {
 
   async *generateStreamingResponse(
     messages: Array<{ role: string; content: string }>,
+    language: 'en' | 'mr',
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.settings) {
-      yield "Please configure your API keys in the settings first.";
+      yield language === 'en'
+        ? "Please configure your API keys in the settings first."
+        : "कृपया प्रथम सेटिंग्जमध्ये आपली API की कॉन्फिगर करा.";
       return;
     }
 
-    // Define a system prompt for educational responses
-    const systemPrompt = `
-      You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
-      Use markdown formatting with headings, lists, and code blocks to structure your answers.
-      If the user asks for examples, provide practical examples.
-      If the user asks for explanations, break down complex concepts into simple terms.
-      If the user asks for a quiz, create a quiz question or practice problem based on the topic.
-    `;
+    const systemPrompt = language === 'en'
+      ? `
+        You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
+        Use markdown formatting with headings, lists, and code blocks to structure your answers.
+        If the user asks for examples, provide practical examples.
+        If the user asks for explanations, break down complex concepts into simple terms.
+        If the user asks for a quiz, create a quiz question or practice problem based on the topic.
+      `
+      : `
+        तुम्ही एक उपयुक्त एआय शिक्षक आहात. वापरकर्त्यांना प्रभावीपणे शिकण्यास मदत करण्यासाठी स्पष्ट, शैक्षणिक प्रतिसाद द्या.
+        आपले उत्तर संरचित करण्यासाठी मार्कडाउन स्वरूपण, शीर्षके, यादी आणि कोड ब्लॉक वापरा.
+        जर वापरकर्त्याने उदाहरणे मागितली, तर व्यावहारिक उदाहरणे द्या.
+        जर वापरकर्त्याने स्पष्टीकरण मागितले, तर जटिल संकल्पना साध्या भाषेत समजावून सांगा.
+        जर वापरकर्त्याने क्विझ मागितली, तर विषयावर आधारित क्विझ प्रश्न किंवा सराव समस्या तयार करा.
+        सर्व प्रतिसाद मराठीत द्या.
+      `;
 
     try {
-      if (this.settings.selectedModel === 'google') {
+      if (this.settings.selectedModel === 'google' && this.googleAI) {
         yield* this.generateGoogleResponse(messages, systemPrompt, onUpdate);
-      } else {
+      } else if (this.settings.selectedModel === 'zhipu' && this.zhipuAI) {
         yield* this.generateZhipuResponse(messages, systemPrompt, onUpdate);
+      } else {
+        yield language === 'en'
+          ? "Selected model is not available or API key is missing."
+          : "निवडलेले मॉडेल उपलब्ध नाही किंवा API की गहाळ आहे.";
       }
     } catch (error) {
       console.error('Error generating response:', error);
-      yield "I apologize, but I encountered an error while processing your request. Please check your API key and try again.";
+      yield language === 'en'
+        ? "I apologize, but I encountered an error while processing your request. Please check your API key and try again."
+        : "मला माफ करा, परंतु तुमच्या विनंतीवर प्रक्रिया करताना मला त्रुटी आली. कृपया तुमची API की तपासा आणि पुन्हा प्रयत्न करा.";
     }
   }
 
@@ -69,44 +86,31 @@ class AIService {
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.googleAI) {
-      yield "Google AI is not properly configured.";
+      yield this.language === 'en'
+        ? "Google AI is not initialized. Please check your API key."
+        : "गूगल एआय सुरू झाले नाही. कृपया आपली API की तपासा.";
       return;
     }
 
-    // For Google Gemini, include the system prompt as the first message
-    const messagesWithSystemPrompt = [
-      { role: 'user', content: systemPrompt },
-      ...messages,
-    ];
-
-    const model = this.googleAI.getGenerativeModel({
-      model: 'gemma-3-27b-it',
+    const model = this.googleAI.getGenerativeModel({ model: 'gemini-pro' });
+    const chat = model.startChat({
+      history: messages.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }],
+      })),
       generationConfig: {
+        maxOutputTokens: 2000,
         temperature: 0.7,
-        topP: 0.8,
-        topK: 40,
-        maxOutputTokens: 2048,
       },
     });
 
-    const chat = model.startChat({
-      history: messagesWithSystemPrompt.slice(0, -1).map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }],
-      })),
-    });
+    const prompt = systemPrompt + '\n\n' + messages[messages.length - 1].content;
+    const result = await chat.sendMessageStream(prompt);
 
-    const lastMessage = messagesWithSystemPrompt[messagesWithSystemPrompt.length - 1];
-    const result = await chat.sendMessageStream(lastMessage.content);
-
-    let fullResponse = '';
     for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      fullResponse += chunkText;
-      if (onUpdate) {
-        onUpdate(fullResponse);
-      }
-      yield chunkText;
+      const text = chunk.text();
+      if (onUpdate) onUpdate(text);
+      yield text;
     }
   }
 
@@ -115,96 +119,10 @@ class AIService {
     systemPrompt: string,
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
-    if (!this.zhipuAI?.apiKey) {
-      yield "ZhipuAI is not properly configured.";
-      return;
-    }
-
-    // For ZhipuAI, include the system prompt as the first message
-    const messagesWithSystemPrompt = [
-      { role: 'system', content: systemPrompt },
-      ...messages,
-    ];
-
-    const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.zhipuAI.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'GLM-4.5-Flash',
-        messages: messagesWithSystemPrompt.map(msg => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-        stream: true,
-        temperature: 0.7,
-        max_tokens: 2048,
-      }),
-    });
-
-    if (!response.ok) {
-      yield `Error: ${response.status} ${response.statusText}`;
-      return;
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      yield "Error: Unable to read response stream";
-      return;
-    }
-
-    const decoder = new TextDecoder();
-    let fullResponse = '';
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-        
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') return;
-            
-            try {
-              const parsed = JSON.parse(data);
-              const content = parsed.choices?.[0]?.delta?.content;
-              if (content) {
-                fullResponse += content;
-                if (onUpdate) {
-                  onUpdate(fullResponse);
-                }
-                yield content;
-              }
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
-        }
-      }
-    } finally {
-      reader.releaseLock();
-    }
-  }
-
-  async generateResponse(messages: Array<{ role: string; content: string }>): Promise<string> {
-    const systemPrompt = `
-      You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
-      Use markdown formatting with headings, lists, and code blocks to structure your answers.
-      If the user asks for examples, provide practical examples.
-      If the user asks for explanations, break down complex concepts into simple terms.
-      If the user asks for a quiz, create a quiz question or practice problem based on the topic.
-    `;
-
-    let fullResponse = '';
-    for await (const chunk of this.generateStreamingResponse(messages)) {
-      fullResponse += chunk;
-    }
-    return fullResponse;
+    // Placeholder for ZhipuAI implementation
+    yield this.language === 'en'
+      ? "ZhipuAI is not fully implemented yet."
+      : "झिपूएआय अद्याप पूर्णपणे लागू केले गेले नाही.";
   }
 }
 
