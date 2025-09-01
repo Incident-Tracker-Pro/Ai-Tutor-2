@@ -53,7 +53,7 @@ export function Sidebar({
             />
             <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400 hidden" />
             {!isFolded && (
-              <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
+              <h1 className={`text-lg font-semibold text-[var(--color-text-primary)] ${selectedLanguage === 'mr' ? 'font-bold' : ''}`}>
                 {selectedLanguage === 'en' ? 'AI Tutor' : 'एआय शिक्षक'}
               </h1>
             )}
@@ -91,14 +91,24 @@ export function Sidebar({
           <>
             <button
               onClick={onNewConversation}
-              className="w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-3"
+              className={`w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-3 ${
+                selectedLanguage === 'mr' ? 'font-bold text-shadow' : ''
+              }`}
+              style={selectedLanguage === 'mr' ? {
+                textShadow: '0 0 1px rgba(255, 255, 255, 0.3)',
+                fontWeight: '700'
+              } : {}}
             >
               <Plus className="w-4 h-4" />
-              {selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
+              <span className={selectedLanguage === 'mr' ? 'font-bold' : ''}>
+                {selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
+              </span>
             </button>
             
             <div className="space-y-2">
-              <p className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1">
+              <p className={`text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1 ${
+                selectedLanguage === 'mr' ? 'font-semibold' : ''
+              }`}>
                 {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -111,7 +121,9 @@ export function Sidebar({
                   }`}
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span className="text-xs font-medium">Gemini</span>
+                  <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
+                    Gemini
+                  </span>
                 </button>
                 <button
                   onClick={() => onModelChange('zhipu')}
@@ -122,7 +134,9 @@ export function Sidebar({
                   }`}
                 >
                   <Bot className="w-4 h-4" />
-                  <span className="text-xs font-medium">ZhipuAI</span>
+                  <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
+                    ZhipuAI
+                  </span>
                 </button>
               </div>
             </div>
@@ -155,7 +169,7 @@ export function Sidebar({
             <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
               <MessageSquare className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2 text-[var(--color-text-secondary)]`} />
               {!isFolded && (
-                <p className="text-sm font-medium">
+                <p className={`text-sm font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                   {selectedLanguage === 'en' ? 'No conversations yet' : 'अद्याप कोणतेही संभाषण नाही'}
                 </p>
               )}
@@ -176,7 +190,9 @@ export function Sidebar({
                   <MessageSquare className="w-4 h-4 flex-shrink-0 text-[var(--color-text-secondary)]" />
                   {!isFolded && (
                     <>
-                      <span className="flex-1 text-sm font-medium text-[var(--color-text-primary)] truncate">
+                      <span className={`flex-1 text-sm font-medium text-[var(--color-text-primary)] truncate ${
+                        selectedLanguage === 'mr' ? 'font-semibold' : ''
+                      }`}>
                         {conversation.title}
                       </span>
                       <button
