@@ -20,9 +20,15 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
     setLocalSettings(settings);
   }, [settings]);
 
+  const handleLanguageChange = (language: 'en' | 'mr') => {
+    console.log('Changing language to:', language); // Debug log
+    setSelectedLanguage(language);
+    localStorage.setItem('ai-tutor-language', language); // Persist immediately
+  };
+
   const handleSave = () => {
+    console.log('Saving settings:', localSettings); // Debug log
     onSaveSettings(localSettings);
-    localStorage.setItem('ai-tutor-language', selectedLanguage);
     onClose();
   };
 
@@ -147,7 +153,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                   name="language"
                   value="en"
                   checked={selectedLanguage === 'en'}
-                  onChange={(e) => setSelectedLanguage(e.target.value as 'en' | 'mr')}
+                  onChange={() => handleLanguageChange('en')}
                   className="text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
                 />
                 <Languages className="w-5 h-5 text-[var(--color-text-secondary)]" />
@@ -159,7 +165,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                   name="language"
                   value="mr"
                   checked={selectedLanguage === 'mr'}
-                  onChange={(e) => setSelectedLanguage(e.target.value as 'en' | 'mr')}
+                  onChange={() => handleLanguageChange('mr')}
                   className="text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
                 />
                 <Languages className="w-5 h-5 text-[var(--color-text-secondary)]" />
