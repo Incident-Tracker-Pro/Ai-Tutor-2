@@ -102,7 +102,7 @@ export function Sidebar({
                   onClick={() => onModelChange('google')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                     settings.selectedModel === 'google'
-                      ? 'bg-green-100 dark:bg-green-900/30 border-2 border-green-500 text-green-700 dark:text-green-300'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-500 text-blue-700 dark:text-blue-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border-2 border-transparent text-gray-600 dark:text-gray-300'
                   }`}
                 >
