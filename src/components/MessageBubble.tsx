@@ -133,8 +133,8 @@ export function MessageBubble({
       <div
         className={`relative max-w-[80%] transition-all duration-200 ${
           isUser
-            ? 'bg-gray-200 dark:bg-gray-300 text-black font-semibold rounded-2xl rounded-br-md'
-            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700'
+            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-md'
+            : 'bg-gray-200 dark:bg-gray-300 text-black font-medium rounded-2xl rounded-bl-md'
         } ${isEditing ? 'ring-2 ring-blue-500/30' : ''} ${showActions ? 'shadow-lg' : ''}`}
       >
         {/* Model indicator for assistant messages */}
@@ -195,7 +195,7 @@ export function MessageBubble({
           ) : (
             <div className={`prose prose-base max-w-none leading-relaxed transition-all duration-200 ${
               isUser
-                ? 'prose-invert font-semibold'
+                ? 'prose-invert font-medium'
                 : 'prose-gray dark:prose-invert'
             }`}>
               <ReactMarkdown
@@ -270,7 +270,7 @@ export function MessageBubble({
             {!isUser && onRegenerateResponse && (
               <button
                 onClick={handleRegenerate}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-all duration-200"
                 title="Regenerate response"
               >
                 <RefreshCcw className="w-4 h-4" />
@@ -279,7 +279,7 @@ export function MessageBubble({
             {onEditMessage && (
               <button
                 onClick={handleEdit}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-all duration-200"
                 title="Edit message"
               >
                 <Edit2 className="w-4 h-4" />
@@ -288,7 +288,7 @@ export function MessageBubble({
             {!isUser && (
               <button
                 onClick={handleCopy}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-all duration-200"
                 title="Copy message"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
