@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Download, X } from 'lucide-react';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 interface InstallPromptProps {
   onInstall: () => void;
@@ -7,6 +8,8 @@ interface InstallPromptProps {
 }
 
 export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
+  const { selectedLanguage } = useContext(LanguageContext);
+
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50 animate-slide-up">
       <div className="flex items-start gap-3">
@@ -16,7 +19,6 @@ export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
             alt="AI Tutor" 
             className="w-6 h-6 object-contain"
             onError={(e) => {
-              // Fallback to a simple icon if robot.png fails to load
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
               target.nextElementSibling?.classList.remove('hidden');
@@ -27,10 +29,12 @@ export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
         
         <div className="flex-1">
           <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
-            Install AI Tutor
+            {selectedLanguage === 'en' ? 'Install AI Tutor' : 'एआय शिक्षक स्थापित करा'}
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
-            Add to your home screen for quick access and offline usage
+            {selectedLanguage === 'en'
+              ? 'Add to your home screen for quick access and offline usage'
+              : 'जलद प्रवेश आणि ऑफलाइन वापरासाठी आपल्या होम स्क्रीनवर जोडा'}
           </p>
           
           <div className="flex gap-2 mt-3">
@@ -39,13 +43,13 @@ export function InstallPrompt({ onInstall, onDismiss }: InstallPromptProps) {
               className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
             >
               <Download className="w-3 h-3" />
-              Install
+              {selectedLanguage === 'en' ? 'Install' : 'स्थापित करा'}
             </button>
             <button
               onClick={onDismiss}
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1.5 text-xs font-medium transition-colors"
             >
-              Not now
+              {selectedLanguage === 'en' ? 'Not now' : 'आता नाही'}
             </button>
           </div>
         </div>
