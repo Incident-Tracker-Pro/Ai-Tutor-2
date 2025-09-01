@@ -76,7 +76,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
       isFocused ? 'ring-2 ring-blue-500/20 shadow-lg' : 'shadow-sm'
     }`}>
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-center gap-3">
+        <div className="flex items-end gap-3">
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -108,11 +108,11 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
             )}
           </div>
 
-          <div className="flex items-center h-[52px]">
+          <div className="flex items-end pb-1">
             <button
               type="submit"
               disabled={!canSend}
-              className={`w-[52px] h-[52px] flex items-center justify-center rounded-lg transition-all duration-200 transform ${
+              className={`w-[48px] h-[48px] flex items-center justify-center rounded-lg transition-all duration-200 transform ${
                 !canSend
                   ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed scale-95 opacity-60'
                   : 'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
