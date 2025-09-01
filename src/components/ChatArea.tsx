@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { Bot } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 import { Message } from '../types';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 interface ChatAreaProps {
   messages: Message[];
@@ -25,6 +26,7 @@ export function ChatArea({
   onEditMessage,
   onRegenerateResponse
 }: ChatAreaProps) {
+  const { selectedLanguage } = useContext(LanguageContext);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
@@ -41,7 +43,7 @@ export function ChatArea({
   const isNearBottom = () => {
     if (!messagesContainerRef.current) return true;
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    return scrollHeight - scrollTop - clientHeight < 100; // Within 100px of bottom
+    return scrollHeight - scrollTop - clientHeight < 100;
   };
 
   const handleScroll = () => {
@@ -51,13 +53,11 @@ export function ChatArea({
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 10;
     const scrollingUp = scrollTop < lastScrollTop.current;
     
-    // User scrolled up while not at bottom
     if (scrollingUp && !isAtBottom) {
       setUserScrolled(true);
       setShowScrollToBottom(true);
     }
     
-    // User scrolled to bottom
     if (isAtBottom) {
       setUserScrolled(false);
       setShowScrollToBottom(false);
@@ -66,14 +66,12 @@ export function ChatArea({
     lastScrollTop.current = scrollTop;
   };
 
-  // Auto-scroll only when user hasn't manually scrolled up
   useEffect(() => {
     if (!userScrolled && (messages.length > 0 || streamingMessage)) {
       scrollToBottom();
     }
   }, [messages.length, streamingMessage?.content, userScrolled]);
 
-  // Reset user scroll state when a new conversation starts
   useEffect(() => {
     if (messages.length === 0) {
       setUserScrolled(false);
@@ -92,15 +90,20 @@ export function ChatArea({
               <Bot className="w-8 h-8 text-blue-600" />
             </div>
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-              How can I help you today?
+              {selectedLanguage === 'en' ? 'How can I help you today?' : 'मी तुम्हाला आज कशी मदत करू शकतो?'}
             </h2>
             <p className="text-gray-600 mb-6">
-              I'm your AI tutor, ready to help you learn and answer any questions you might have.
+              {selectedLanguage === 'en'
+                ? "I'm your AI tutor, ready to help you learn and answer any questions you might have."
+                : 'मी तुमचा एआय शिक्षक आहे, तुम्हाला शिकण्यास आणि तुमच्या कोणत्याही प्रश्नांचे उत्तर देण्यास तयार आहे.'}
             </p>
             {!hasApiKey && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
                 <p className="text-sm text-yellow-800">
-                  <strong>Setup Required:</strong> Please configure your API keys in Settings to start chatting.
+                  <strong>{selectedLanguage === 'en' ? 'Setup Required:' : 'सेटअप आवश्यक:'}</strong>{' '}
+                  {selectedLanguage === 'en'
+                    ? 'Please configure your API keys in Settings to start chatting.'
+                    : 'कृपया चॅटिंग सुरू करण्यासाठी सेटिंग्जमध्ये आपली API की कॉन्फिगर करा.'}
                 </p>
               </div>
             )}
@@ -113,7 +116,7 @@ export function ChatArea({
           onScroll={handleScroll}
           style={{
             scrollBehavior: userScrolled ? 'auto' : 'smooth',
-            WebkitOverflowScrolling: 'touch' // Better scrolling on iOS
+            WebkitOverflowScrolling: 'touch'
           }}
         >
           <div className="max-w-3xl mx-auto px-4 py-6">
@@ -140,7 +143,6 @@ export function ChatArea({
         </div>
       )}
 
-      {/* Scroll to bottom button */}
       {showScrollToBottom && (
         <button
           onClick={() => {
@@ -149,7 +151,7 @@ export function ChatArea({
             scrollToBottom();
           }}
           className="absolute bottom-20 right-6 bg-white border border-gray-300 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 z-10 hover:scale-105"
-          aria-label="Scroll to bottom"
+          aria-label={selectedLanguage === 'en' ? 'Scroll to bottom' : 'खाली स्क्रोल करा'}
         >
           <svg
             className="w-4 h-4 text-gray-600"
