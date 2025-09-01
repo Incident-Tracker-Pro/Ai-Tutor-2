@@ -52,7 +52,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           <button
             type="submit"
             disabled={!input.trim() || isLoading || disabled}
-            className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-sm"
+            className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-sm"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
