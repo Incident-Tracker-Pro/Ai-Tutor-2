@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Laila:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,7 +15,7 @@
     --color-text-placeholder: #6B7280;
     --color-accent: #3B82F6;
     --font-weight: 400;
-    --font-marathi: 'Laila', sans-serif;
+    --font-marathi: 'Tiro Devanagari Marathi', serif;
   }
 
   .light-theme {
@@ -34,12 +34,12 @@
     overflow-x: hidden;
   }
 
-  /* Enhanced Marathi/Devanagari font styling */
+  /* Marathi/Devanagari font styling */
   body[data-lang="mr"],
   .marathi-text,
   [lang="mr"] {
     font-family: var(--font-marathi) !important;
-    font-weight: 500 !important;
+    font-weight: 400 !important;
     font-size: 1.05em !important;
     line-height: 1.7 !important;
     letter-spacing: 0.01em !important;
@@ -50,7 +50,12 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Specific weight adjustments for Marathi text */
+  /* Match English font weights */
+  .marathi-text.font-medium,
+  [lang="mr"].font-medium {
+    font-weight: 500 !important;
+  }
+
   .marathi-text.font-semibold,
   [lang="mr"].font-semibold {
     font-weight: 600 !important;
@@ -59,10 +64,6 @@
   .marathi-text.font-bold,
   [lang="mr"].font-bold {
     font-weight: 700 !important;
-  }
-
-  html {
-    scroll-behavior: smooth;
   }
 }
 
@@ -84,7 +85,6 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-accent);
   }
-
   /* Smooth sidebar transitions */
   .sidebar {
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -93,7 +93,6 @@
   .sidebar-folded {
     transform: translateX(-100%) translateZ(0);
   }
-
   /* Message animations */
   @keyframes slideUp {
     from {
@@ -149,14 +148,12 @@
   .animate-bounce-in {
     animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
-
   /* Smooth loading states */
   .loading-shimmer {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200px 100%;
     animation: shimmer 1.5s infinite;
   }
-
   /* Button hover effects */
   .smooth-button {
     transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -170,7 +167,6 @@
     transform: translateY(0) translateZ(0);
     transition: all 0.1s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
-
   /* Message bubble improvements */
   .message-bubble {
     transition: all 0.2s ease-out;
@@ -179,14 +175,12 @@
   .message-bubble:hover {
     transform: translateY(-1px) translateZ(0);
   }
-
   /* Smooth focus states */
   .focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
     transition: outline-offset 0.2s ease;
   }
-
   /* Chat input improvements */
   .chat-input {
     transition: all 0.2s ease;
@@ -195,7 +189,6 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
   }
-
   /* Typing indicator */
   .typing-dot {
     width: 8px;
@@ -216,7 +209,6 @@
       opacity: 1;
     }
   }
-
   /* Enhanced mobile experience */
   @media (max-width: 768px) {
     /* Improved touch targets */
@@ -234,18 +226,15 @@
       font-size: 16px;
     }
   }
-
   /* PWA Install Prompt Animation */
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
-
   /* PWA Specific Styles */
   @media (display-mode: standalone) {
     body {
       user-select: none;
     }
-
     /* Hide scrollbars in standalone mode for cleaner look */
     ::-webkit-scrollbar {
       width: 2px;
@@ -258,7 +247,6 @@
       padding-right: env(safe-area-inset-right);
     }
   }
-
   /* Mobile PWA adjustments */
   @media (max-width: 768px) and (display-mode: standalone) {
     .sidebar {
@@ -268,7 +256,6 @@
       padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
     }
   }
-
   /* Smooth modal transitions */
   .modal-backdrop {
     backdrop-filter: blur(4px);
@@ -283,7 +270,6 @@
     transform: translateY(0);
     opacity: 1;
   }
-
   /* Loading states */
   .pulse-subtle {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -296,7 +282,6 @@
       opacity: 0.7;
     }
   }
-
   /* Improved accessibility */
   .sr-only {
     position: absolute;
@@ -309,7 +294,6 @@
     white-space: nowrap;
     border: 0;
   }
-
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     :root {
@@ -317,14 +301,12 @@
       --color-text-primary: #000000;
       --color-bg: #ffffff;
     }
-
     .dark {
       --color-border: #ffffff;
       --color-text-primary: #ffffff;
       --color-bg: #000000;
     }
   }
-
   /* Reduced motion for accessibility */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -336,7 +318,6 @@
       scroll-behavior: auto !important;
     }
   }
-
   /* Smooth spring animations */
   .spring-bounce {
     transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
