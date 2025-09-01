@@ -14,6 +14,7 @@
     --color-text-secondary: #9CA3AF;
     --color-text-placeholder: #6B7280;
     --color-accent: #3B82F6;
+    --color-accent-hover: #2563EB;
     --font-weight: 400;
     --font-marathi: 'Tiro Devanagari Marathi', serif;
     --font-english: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
@@ -28,6 +29,7 @@
     --color-text-secondary: #6c757d;
     --color-text-placeholder: #adb5bd;
     --color-accent: #3B82F6;
+    --color-accent-hover: #2563EB;
   }
 
   body {
@@ -41,7 +43,7 @@
   .marathi-text,
   [lang="mr"] {
     font-family: var(--font-marathi) !important;
-    font-weight: 400 !important; /* Base weight matches English */
+    font-weight: 500 !important; /* Increased base weight for better visibility */
     font-size: 1.1em !important; /* Slightly larger for better readability */
     line-height: 1.8 !important; /* Increased line height for Devanagari */
     letter-spacing: 0.02em !important; /* Improved letter spacing */
@@ -54,18 +56,31 @@
 
   /* Font weight mapping to maintain consistency with English */
   .marathi-text.font-medium,
-  [lang="mr"].font-medium {
-    font-weight: 500 !important; /* Medium weight */
+  [lang="mr"].font-medium,
+  body[data-lang="mr"] .font-medium {
+    font-weight: 600 !important; /* Increased for better visibility */
   }
 
   .marathi-text.font-semibold,
-  [lang="mr"].font-semibold {
-    font-weight: 600 !important; /* Semibold weight */
+  [lang="mr"].font-semibold,
+  body[data-lang="mr"] .font-semibold {
+    font-weight: 700 !important; /* Increased for better visibility */
   }
 
   .marathi-text.font-bold,
-  [lang="mr"].font-bold {
-    font-weight: 700 !important; /* Bold weight */
+  [lang="mr"].font-bold,
+  body[data-lang="mr"] .font-bold {
+    font-weight: 700 !important; /* Maximum bold weight */
+  }
+
+  /* Force bold for specific UI elements in Marathi */
+  body[data-lang="mr"] button,
+  body[data-lang="mr"] .btn,
+  [lang="mr"] button,
+  [lang="mr"] .btn {
+    font-family: var(--font-marathi) !important;
+    font-weight: 600 !important; /* Bold weight for buttons */
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5); /* Add text shadow for better visibility */
   }
 
   /* Specific adjustments for different UI elements in Marathi */
@@ -82,17 +97,9 @@
   [lang="mr"] h5,
   [lang="mr"] h6 {
     font-family: var(--font-marathi) !important;
-    font-weight: 600 !important; /* Headings use semibold */
+    font-weight: 700 !important; /* Bold headings */
     line-height: 1.6 !important;
-  }
-
-  /* Button and interactive elements in Marathi */
-  body[data-lang="mr"] button,
-  body[data-lang="mr"] .btn,
-  [lang="mr"] button,
-  [lang="mr"] .btn {
-    font-family: var(--font-marathi) !important;
-    font-weight: 500 !important; /* Medium weight for buttons */
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3); /* Add text shadow for better visibility */
   }
 
   /* Input and form elements in Marathi */
@@ -103,7 +110,7 @@
   [lang="mr"] textarea,
   [lang="mr"] select {
     font-family: var(--font-marathi) !important;
-    font-weight: 400 !important; /* Regular weight for inputs */
+    font-weight: 500 !important; /* Medium weight for inputs */
     font-size: 1.05em !important;
   }
 
@@ -113,8 +120,17 @@
   [lang="mr"] input::placeholder,
   [lang="mr"] textarea::placeholder {
     font-family: var(--font-marathi) !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
     opacity: 0.7;
+  }
+
+  /* Force bold for navigation and important text in Marathi */
+  body[data-lang="mr"] .sidebar button,
+  body[data-lang="mr"] .sidebar .font-semibold,
+  [lang="mr"] .sidebar button,
+  [lang="mr"] .sidebar .font-semibold {
+    font-weight: 700 !important;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
   }
 
   html {
@@ -407,5 +423,32 @@
   }
   .spring-gentle {
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Custom button styles that match chat UI */
+  .chat-ui-button {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+
+  .chat-ui-button:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #2563eb 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .chat-ui-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+
+  .chat-ui-button:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
