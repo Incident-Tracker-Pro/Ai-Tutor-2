@@ -1,4 +1,18 @@
-// ... (all your existing imports and interface)
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Smile, Sparkles, Copy, Check, Edit2, RefreshCcw, Save, X } from 'lucide-react';
+import { Message } from '../types';
+
+interface MessageBubbleProps {
+  message: Message;
+  isStreaming?: boolean;
+  model?: 'google' | 'zhipu';
+  onEditMessage?: (messageId: string, newContent: string) => void;
+  onRegenerateResponse?: (messageId: string) => void;
+}
 
 export function MessageBubble({
   message,
@@ -7,14 +21,96 @@ export function MessageBubble({
   onEditMessage,
   onRegenerateResponse
 }: MessageBubbleProps) {
-  // ... (all your existing state and refs)
+  const isUser = message.role === 'user';
+  const [copied, setCopied] = useState(false);
+  const [editContent, setEditContent] = useState(message.content);
+  const [isEditing, setIsEditing] = useState(message.isEditing || false);
+  const [showActions, setShowActions] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const copyTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Use the model stored in the message for assistant messages, fallback to current model
   const displayModel = isUser ? undefined : (message.model || model);
 
-  // ... (all your existing handlers: handleCopy, handleEdit, handleSaveEdit, handleCancelEdit, handleRegenerate)
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+    }
+  }, [message.content]);
 
-  // ... (all your existing useEffects)
+  const handleEdit = useCallback(() => {
+    setIsEditing(true);
+    setEditContent(message.content);
+  }, [message.content]);
+
+  const handleSaveEdit = useCallback(() => {
+    if (editContent.trim() !== message.content && onEditMessage) {
+      onEditMessage(message.id, editContent.trim());
+    }
+    setIsEditing(false);
+  }, [editContent, message.content, message.id, onEditMessage]);
+
+  const handleCancelEdit = useCallback(() => {
+    setIsEditing(false);
+    setEditContent(message.content);
+  }, [message.content]);
+
+  const handleRegenerate = useCallback(() => {
+    if (onRegenerateResponse) {
+      onRegenerateResponse(message.id);
+    }
+  }, [message.id, onRegenerateResponse]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [isEditing, editContent]);
+
+  // Handle keyboard shortcuts
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  }, [handleSaveEdit, handleCancelEdit]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Smooth entrance animation
+  useEffect(() => {
+    if (bubbleRef.current) {
+      bubbleRef.current.style.transform = 'translateY(20px)';
+      bubbleRef.current.style.opacity = '0';
+
+      const timeout = setTimeout(() => {
+        if (bubbleRef.current) {
+          bubbleRef.current.style.transform = 'translateY(0)';
+          bubbleRef.current.style.opacity = '1';
+        }
+      }, 50);
+
+      return () => clearTimeout(timeout);
+    }
+  }, []);
 
   return (
     <div
