@@ -28,6 +28,7 @@ export function MessageBubble({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Use the model stored in the message for assistant messages, fallback to current model
+  // This is the key line that fixes the retroactive model name change bug
   const displayModel = isUser ? undefined : (message.model || model);
 
   const handleCopy = async () => {
