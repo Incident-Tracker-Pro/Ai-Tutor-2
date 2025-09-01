@@ -92,25 +92,32 @@ class AIService {
       return;
     }
 
-    const model = this.googleAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = this.googleAI.getGenerativeModel({
+      model: 'gemini-pro',
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.8,
+        topK: 40,
+        maxOutputTokens: 2048,
+      },
+    });
+
     const chat = model.startChat({
       history: messages.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }],
       })),
-      generationConfig: {
-        maxOutputTokens: 2000,
-        temperature: 0.7,
-      },
     });
 
     const prompt = systemPrompt + '\n\n' + messages[messages.length - 1].content;
     const result = await chat.sendMessageStream(prompt);
 
+    let fullResponse = '';
     for await (const chunk of result.stream) {
-      const text = chunk.text();
-      if (onUpdate) onUpdate(text);
-      yield text;
+      const chunkText = chunk.text();
+      fullResponse += chunkText;
+      if (onUpdate) onUpdate(fullResponse);
+      yield chunkText;
     }
   }
 
@@ -119,10 +126,108 @@ class AIService {
     systemPrompt: string,
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
-    // Placeholder for ZhipuAI implementation
-    yield this.language === 'en'
-      ? "ZhipuAI is not fully implemented yet."
-      : "झिपूएआय अद्याप पूर्णपणे लागू केले गेले नाही.";
+    if (!this.zhipuAI?.apiKey) {
+      yield this.language === 'en'
+        ? "ZhipuAI is not properly configured."
+        : "झिपूएआय योग्यरित्या कॉन्फिगर केलेले नाही.";
+      return;
+    }
+
+    const messagesWithSystemPrompt = [
+      { role: 'system', content: systemPrompt },
+      ...messages,
+    ];
+
+    const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.zhipuAI.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'GLM-4.5-Flash',
+        messages: messagesWithSystemPrompt.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+        })),
+        stream: true,
+        temperature: 0.7,
+        max_tokens: 2048,
+      }),
+    });
+
+    if (!response.ok) {
+      yield this.language === 'en'
+        ? `Error: ${response.status} ${response.statusText}`
+        : `त्रुटी: ${response.status} ${response.statusText}`;
+      return;
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      yield this.language === 'en'
+        ? "Error: Unable to read response stream"
+        : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
+      return;
+    }
+
+    const decoder = new TextDecoder();
+    let fullResponse = '';
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') return;
+
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                fullResponse += content;
+                if (onUpdate) onUpdate(fullResponse);
+                yield content;
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  async generateResponse(messages: Array<{ role: string; content: string }>): Promise<string> {
+    const systemPrompt = this.language === 'en'
+      ? `
+        You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
+        Use markdown formatting with headings, lists, and code blocks to structure your answers.
+        If the user asks for examples, provide practical examples.
+        If the user asks for explanations, break down complex concepts into simple terms.
+        If the user asks for a quiz, create a quiz question or practice problem based on the topic.
+      `
+      : `
+        तुम्ही एक उपयुक्त एआय शिक्षक आहात. वापरकर्त्यांना प्रभावीपणे शिकण्यास मदत करण्यासाठी स्पष्ट, शैक्षणिक प्रतिसाद द्या.
+        आपले उत्तर संरचित करण्यासाठी मार्कडाउन स्वरूपण, शीर्षके, यादी आणि कोड ब्लॉक वापरा.
+        जर वापरकर्त्याने उदाहरणे मागितली, तर व्यावहारिक उदाहरणे द्या.
+        जर वापरकर्त्याने स्पष्टीकरण मागितले, तर जटिल संकल्पना साध्या भाषेत समजावून सांगा.
+        जर वापरकर्त्याने क्विझ मागितली, तर विषयावर आधारित क्विझ प्रश्न किंवा सराव समस्या तयार करा.
+        सर्व प्रतिसाद मराठीत द्या.
+      `;
+
+    let fullResponse = '';
+    for await (const chunk of this.generateStreamingResponse(messages, this.language)) {
+      fullResponse += chunk;
+    }
+    return fullResponse;
   }
 }
 
