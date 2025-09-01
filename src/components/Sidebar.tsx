@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { Plus, MessageSquare, Settings, Trash2, Bot, X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Conversation } from '../types';
+import { LanguageContext } from '../contexts/LanguageContext';
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -29,6 +30,8 @@ export function Sidebar({
   isFolded = false,
   onToggleFold,
 }: SidebarProps) {
+  const { selectedLanguage } = useContext(LanguageContext);
+
   return (
     <div
       className={`${
@@ -50,7 +53,9 @@ export function Sidebar({
             />
             <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400 hidden" />
             {!isFolded && (
-              <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
+              <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                {selectedLanguage === 'en' ? 'AI Tutor' : 'एआय शिक्षक'}
+              </h1>
             )}
           </div>
           <div className="flex gap-1">
@@ -58,7 +63,7 @@ export function Sidebar({
               <button
                 onClick={onOpenSettings}
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                title="Settings"
+                title={selectedLanguage === 'en' ? 'Settings' : 'सेटिंग्ज'}
               >
                 <Settings className="w-4 h-4" />
               </button>
@@ -67,7 +72,7 @@ export function Sidebar({
               <button
                 onClick={onToggleFold}
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors hidden md:block"
-                title={isFolded ? "Expand sidebar" : "Collapse sidebar"}
+                title={selectedLanguage === 'en' ? (isFolded ? 'Expand sidebar' : 'Collapse sidebar') : (isFolded ? 'साइडबार विस्तृत करा' : 'साइडबार संकुचित करा')}
               >
                 {isFolded ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
               </button>
@@ -75,7 +80,7 @@ export function Sidebar({
             <button
               onClick={onCloseSidebar}
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors md:hidden"
-              title="Close sidebar"
+              title={selectedLanguage === 'en' ? 'Close sidebar' : 'साइडबार बंद करा'}
             >
               <X className="w-4 h-4" />
             </button>
@@ -89,13 +94,12 @@ export function Sidebar({
               className="w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-3"
             >
               <Plus className="w-4 h-4" />
-              New chat
+              {selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
             </button>
             
-            {/* Model Selector */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1">
-                AI Model
+                {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -125,20 +129,19 @@ export function Sidebar({
           </>
         )}
         
-        {/* Folded state buttons */}
         {isFolded && (
           <div className="space-y-3">
             <button
               onClick={onNewConversation}
               className="w-full flex items-center justify-center p-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm"
-              title="New chat"
+              title={selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
             >
               <Plus className="w-4 h-4" />
             </button>
             <button
               onClick={onOpenSettings}
               className="w-full flex items-center justify-center p-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
-              title="Settings"
+              title={selectedLanguage === 'en' ? 'Settings' : 'सेटिंग्ज'}
             >
               <Settings className="w-4 h-4" />
             </button>
@@ -152,7 +155,9 @@ export function Sidebar({
             <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
               <MessageSquare className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2 text-[var(--color-text-secondary)]`} />
               {!isFolded && (
-                <p className="text-sm font-medium">No conversations yet</p>
+                <p className="text-sm font-medium">
+                  {selectedLanguage === 'en' ? 'No conversations yet' : 'अद्याप कोणतेही संभाषण नाही'}
+                </p>
               )}
             </div>
           ) : (
@@ -180,7 +185,7 @@ export function Sidebar({
                           onDeleteConversation(conversation.id);
                         }}
                         className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 rounded transition-all"
-                        title="Delete conversation"
+                        title={selectedLanguage === 'en' ? 'Delete conversation' : 'संभाषण हटवा'}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
