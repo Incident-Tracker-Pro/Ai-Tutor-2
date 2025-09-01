@@ -130,7 +130,7 @@ export function Sidebar({
           <div className="space-y-3">
             <button
               onClick={onNewConversation}
-              className="w-full flex items-center justify-center p-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-white border border-blue-600 shadow-sm"
+              className="w-full flex items-center justify-center p-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)] shadow-sm"
               title="New chat"
             >
               <Plus className="w-4 h-4" />
