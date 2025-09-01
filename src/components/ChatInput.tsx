@@ -38,7 +38,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
-      
+
       resizeTimeoutRef.current = setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.style.height = 'auto';
@@ -76,7 +76,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
       isFocused ? 'ring-2 ring-blue-500/20 shadow-lg' : 'shadow-sm'
     }`}>
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-end gap-3">
+        <div className="flex items-center gap-3">
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -88,8 +88,8 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
               disabled={disabled || isLoading}
               className={`w-full min-h-[52px] max-h-[120px] p-3 pr-12 border rounded-lg resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium ${
-                disabled || isLoading 
-                  ? 'border-gray-300 dark:border-gray-600 cursor-not-allowed' 
+                disabled || isLoading
+                  ? 'border-gray-300 dark:border-gray-600 cursor-not-allowed'
                   : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
               }`}
               rows={1}
@@ -107,26 +107,28 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               </div>
             )}
           </div>
-          
-          <button
-            type="submit"
-            disabled={!canSend}
-            className={`w-[52px] h-[52px] flex items-center justify-center rounded-lg transition-all duration-200 transform ${
-              !canSend
-                ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed scale-95 opacity-60'
-                : 'bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
-            } text-white`}
-            title={!canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)'}
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className={`w-5 h-5 transition-transform duration-200 ${canSend ? 'translate-x-0.5' : ''}`} />
-            )}
-          </button>
+
+          <div className="flex items-center h-[52px]">
+            <button
+              type="submit"
+              disabled={!canSend}
+              className={`w-[52px] h-[52px] flex items-center justify-center rounded-lg transition-all duration-200 transform ${
+                !canSend
+                  ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed scale-95 opacity-60'
+                  : 'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
+              } text-white`}
+              title={!canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)'}
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className={`w-5 h-5 transition-transform duration-200 ${canSend ? 'translate-x-0.5' : ''}`} />
+              )}
+            </button>
+          </div>
         </div>
       </form>
-      
+
       {/* Status text */}
       <div className={`transition-all duration-200 overflow-hidden ${
         disabled || input.length > 1500 ? 'max-h-10 mt-2 opacity-100' : 'max-h-0 opacity-0'
@@ -144,12 +146,12 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           </p>
         )}
       </div>
-      
+
       {/* Keyboard shortcuts hint */}
       {isFocused && !disabled && (
         <div className="mt-2 flex justify-center">
           <p className="text-xs text-gray-400 dark:text-gray-500 transition-opacity duration-200">
-            <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> to send, 
+            <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> to send,
             <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs ml-1">Shift+Enter</kbd> for new line
           </p>
         </div>
