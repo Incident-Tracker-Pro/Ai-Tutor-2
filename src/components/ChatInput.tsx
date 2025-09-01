@@ -36,7 +36,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
   return (
     <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-end gap-3">
+        <div className="flex gap-3">
           <div className="flex-1">
             <textarea
               ref={textareaRef}
@@ -49,17 +49,23 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               rows={1}
             />
           </div>
-          <button
-            type="submit"
-            disabled={!input.trim() || isLoading || disabled}
-            className="flex-shrink-0 flex items-center justify-center w-[52px] h-[52px] bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-sm self-end"
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              disabled={!input.trim() || isLoading || disabled}
+              className={`flex-shrink-0 flex items-center justify-center w-[52px] h-[52px] text-white rounded-lg transition-all duration-200 shadow-sm ${
+                !input.trim() || isLoading || disabled
+                  ? 'bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed opacity-60'
+                  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-md transform hover:scale-105'
+              }`}
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </form>
       {disabled && (
