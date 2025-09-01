@@ -69,19 +69,24 @@ export function MessageBubble({
     }
   }, [message.id, onRegenerateResponse]);
 
-  // Auto-resize textarea
+  // Auto-resize textarea with smooth transitions
   useEffect(() => {
     if (isEditing && textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      const newHeight = Math.min(textarea.scrollHeight, 300);
+      textarea.style.height = `${newHeight}px`;
+      textarea.focus();
     }
   }, [isEditing, editContent]);
 
   // Handle keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
       handleSaveEdit();
     } else if (e.key === 'Escape') {
+      e.preventDefault();
       handleCancelEdit();
     }
   }, [handleSaveEdit, handleCancelEdit]);
@@ -115,139 +120,175 @@ export function MessageBubble({
   return (
     <div
       ref={bubbleRef}
-      className={`flex gap-3 mb-2 ${isUser ? 'justify-end' : 'justify-start'} group transition-all duration-300 ease-out`}
+      className={`flex gap-3 mb-4 ${isUser ? 'justify-end' : 'justify-start'} group transition-all duration-300 ease-out`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {!isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 transition-all duration-200 hover:scale-105">
           <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
 
       <div
-        className={`relative max-w-[80%] p-4 rounded-xl bg-gray-200 dark:bg-gray-300 ${
-          isUser ? 'text-black font-semibold' : 'text-black font-medium'
-        }`}
+        className={`relative max-w-[80%] transition-all duration-200 ${
+          isUser
+            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-md'
+            : 'bg-gray-200 dark:bg-gray-300 text-black font-medium rounded-2xl rounded-bl-md'
+        } ${isEditing ? 'ring-2 ring-blue-500/30' : ''} ${showActions ? 'shadow-lg' : ''}`}
       >
-        {/* Only show model name for assistant messages and use the stored model */}
+        {/* Model indicator for assistant messages */}
         {!isUser && displayModel && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
-            {displayModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}
-          </div>
-        )}
-
-        {isEditing ? (
-          <div className="space-y-3">
-            <textarea
-              ref={textareaRef}
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full min-h-[100px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black font-medium"
-              placeholder="Edit your message..."
-            />
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={handleCancelEdit}
-                className="flex items-center gap-1 px-3 py-1.5 text-gray-600 hover:text-gray-800 transition-colors text-sm"
-              >
-                <X className="w-3 h-3" />
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-colors text-sm font-medium"
-                disabled={editContent.trim() === message.content || !editContent.trim()}
-              >
-                <Save className="w-3 h-3" />
-                Save
-              </button>
+          <div className="px-4 pt-3 pb-1">
+            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
+              displayModel === 'google'
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+            }`}>
+              {displayModel === 'google' ? (
+                <>
+                  <Sparkles className="w-3 h-3" />
+                  Google Gemini
+                </>
+              ) : (
+                <>
+                  <div className="w-3 h-3 rounded-full bg-purple-500" />
+                  ZhipuAI
+                </>
+              )}
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Press Ctrl+Enter to save, Escape to cancel
-            </p>
-          </div>
-        ) : (
-          <div className={`prose prose-base max-w-none leading-relaxed ${isUser ? 'font-semibold' : ''}`}>
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || '');
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      style={oneDark}
-                      language={match[1]}
-                      PreTag="div"
-                      className="rounded-md my-2"
-                      {...props}
-                    >
-                      {String(children).replace(/\n$/, '')}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-                table({ children }) {
-                  return (
-                    <div className="overflow-x-auto my-4">
-                      <table className="border-collapse border border-gray-300 dark:border-gray-600 w-full">
-                        {children}
-                      </table>
-                    </div>
-                  );
-                },
-                th({ children }) {
-                  return (
-                    <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium">
-                      {children}
-                    </th>
-                  );
-                },
-                td({ children }) {
-                  return <td className="border border-gray-300 dark:border-gray-600 p-2">{children}</td>;
-                },
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-            {isStreaming && (
-              <span className="inline-block w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-pulse ml-1"></span>
-            )}
           </div>
         )}
 
-        {/* Action buttons - Only show for non-editing, non-streaming messages with content */}
+        <div className="p-4">
+          {isEditing ? (
+            <div className="space-y-3">
+              <textarea
+                ref={textareaRef}
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full min-h-[100px] max-h-[300px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium transition-all duration-200"
+                placeholder="Edit your message..."
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex items-center gap-1 px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 text-sm font-medium"
+                >
+                  <X className="w-3 h-3" />
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition-all duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md active:scale-95"
+                  disabled={editContent.trim() === message.content || !editContent.trim()}
+                >
+                  <Save className="w-3 h-3" />
+                  Save
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Press <kbd className="px-1 bg-gray-200 dark:bg-gray-700 rounded">Ctrl+Enter</kbd> to save, <kbd className="px-1 bg-gray-200 dark:bg-gray-700 rounded">Escape</kbd> to cancel
+              </p>
+            </div>
+          ) : (
+            <div className={`prose prose-base max-w-none leading-relaxed transition-all duration-200 ${
+              isUser
+                ? 'prose-invert font-medium'
+                : 'prose-gray dark:prose-invert'
+            }`}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '');
+                    return !inline && match ? (
+                      <div className="my-3 rounded-lg overflow-hidden shadow-sm">
+                        <SyntaxHighlighter
+                          style={oneDark}
+                          language={match[1]}
+                          PreTag="div"
+                          className="!m-0 !bg-gray-900"
+                          {...props}
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      </div>
+                    ) : (
+                      <code className={`px-1.5 py-0.5 rounded text-sm font-medium transition-colors duration-200 ${
+                        isUser
+                          ? 'bg-blue-400/30 text-blue-100'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                      }`} {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                  table({ children }) {
+                    return (
+                      <div className="overflow-x-auto my-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <table className="border-collapse w-full">
+                          {children}
+                        </table>
+                      </div>
+                    );
+                  },
+                  th({ children }) {
+                    return (
+                      <th className="border-b border-gray-200 dark:border-gray-700 p-3 bg-gray-50 dark:bg-gray-800 text-left font-semibold">
+                        {children}
+                      </th>
+                    );
+                  },
+                  td({ children }) {
+                    return <td className="border-b border-gray-200 dark:border-gray-700 p-3">{children}</td>;
+                  },
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+              {isStreaming && (
+                <div className="inline-flex items-center gap-1 mt-2">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">AI is typing...</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons */}
         {!isEditing && !isStreaming && message.content.length > 0 && (
-          <div className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
-            {/* Regenerate button - Only for assistant messages */}
+          <div className={`absolute top-2 right-2 flex gap-1 transition-all duration-200 ${
+            showActions ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-1 pointer-events-none'
+          }`}>
             {!isUser && onRegenerateResponse && (
               <button
                 onClick={handleRegenerate}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-all duration-200"
                 title="Regenerate response"
               >
                 <RefreshCcw className="w-4 h-4" />
               </button>
             )}
-            {/* Edit button - Available for all messages */}
             {onEditMessage && (
               <button
                 onClick={handleEdit}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-all duration-200"
                 title="Edit message"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
             )}
-            {/* Copy button - Only for assistant messages */}
             {!isUser && (
               <button
                 onClick={handleCopy}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-all duration-200"
                 title="Copy message"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
