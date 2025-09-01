@@ -125,7 +125,7 @@ export function MessageBubble({
       onMouseLeave={() => setShowActions(false)}
     >
       {!isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 transition-all duration-200 hover:scale-105">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 transition-all duration-200 hover:scale-105">
           <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
@@ -133,7 +133,7 @@ export function MessageBubble({
       <div
         className={`relative max-w-[80%] transition-all duration-200 ${
           isUser
-            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl rounded-br-md'
+            ? 'bg-gray-200 dark:bg-gray-300 text-black font-semibold rounded-2xl rounded-br-md'
             : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl rounded-bl-md shadow-sm border border-gray-200 dark:border-gray-700'
         } ${isEditing ? 'ring-2 ring-blue-500/30' : ''} ${showActions ? 'shadow-lg' : ''}`}
       >
@@ -195,7 +195,7 @@ export function MessageBubble({
           ) : (
             <div className={`prose prose-base max-w-none leading-relaxed transition-all duration-200 ${
               isUser
-                ? 'prose-invert font-medium'
+                ? 'prose-invert font-semibold'
                 : 'prose-gray dark:prose-invert'
             }`}>
               <ReactMarkdown
@@ -237,8 +237,8 @@ export function MessageBubble({
                   th({ children }) {
                     return (
                       <th className="border-b border-gray-200 dark:border-gray-700 p-3 bg-gray-50 dark:bg-gray-800 text-left font-semibold">
-                      {children}
-                    </th>
+                        {children}
+                      </th>
                     );
                   },
                   td({ children }) {
@@ -299,7 +299,7 @@ export function MessageBubble({
       </div>
 
       {isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-blue-500 transition-all duration-200 hover:scale-105">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
           <Smile className="w-5 h-5 text-white" />
         </div>
       )}
