@@ -34,29 +34,33 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
   }, [input]);
 
   return (
-    <div className="p-4 bg-gray-200 dark:bg-gray-800 rounded-xl">
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
       <form onSubmit={handleSubmit} className="relative">
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
-          disabled={disabled || isLoading}
-          className="w-full min-h-[52px] max-h-[120px] p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-black placeholder-gray-400 dark:placeholder-gray-500 font-semibold"
-          rows={1}
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || isLoading || disabled}
-          className="absolute right-3 bottom-3 p-1 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed"
-        >
-          {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <Send className="w-5 h-5" />
-          )}
-        </button>
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
+              disabled={disabled || isLoading}
+              className="w-full min-h-[52px] max-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium transition-colors"
+              rows={1}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading || disabled}
+            className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-sm"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
+        </div>
       </form>
       {disabled && (
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
