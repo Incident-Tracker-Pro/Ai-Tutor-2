@@ -36,36 +36,32 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
   return (
     <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
-              disabled={disabled || isLoading}
-              className="w-full min-h-[52px] max-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium transition-colors"
-              rows={1}
-            />
-          </div>
-          <div className="flex items-end">
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading || disabled}
-              className={`flex-shrink-0 flex items-center justify-center w-[52px] h-[52px] text-white rounded-lg transition-all duration-200 shadow-sm ${
-                !input.trim() || isLoading || disabled
-                  ? 'bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed opacity-60'
-                  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-md transform hover:scale-105'
-              }`}
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+        <div className="flex items-end gap-3">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
+            disabled={disabled || isLoading}
+            className="flex-1 min-h-[52px] max-h-[120px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium transition-colors"
+            rows={1}
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading || disabled}
+            className={`w-[52px] h-[52px] flex items-center justify-center rounded-lg transition-colors ${
+              !input.trim() || isLoading || disabled
+                ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+                : 'bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500'
+            } text-white`}
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
         </div>
       </form>
       {disabled && (
