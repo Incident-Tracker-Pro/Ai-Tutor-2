@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -9,6 +9,7 @@ import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
 import { usePWA } from './hooks/usePWA';
 import { Menu } from 'lucide-react';
+import { LanguageContext } from './contexts/LanguageContext';
 
 const defaultSettings: APISettings = {
   googleApiKey: '',
@@ -17,6 +18,7 @@ const defaultSettings: APISettings = {
 };
 
 function App() {
+  const { selectedLanguage } = useContext(LanguageContext);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -26,7 +28,6 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
   
-  // PWA hooks
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
   useEffect(() => {
@@ -37,14 +38,13 @@ function App() {
     if (savedConversations.length > 0) {
       setCurrentConversationId(savedConversations[0].id);
     }
-    aiService.updateSettings(savedSettings);
+    aiService.updateSettings(savedSettings, selectedLanguage);
     
-    // Load sidebar folded state from localStorage
     const savedSidebarFolded = localStorage.getItem('ai-tutor-sidebar-folded');
     if (savedSidebarFolded) {
       setSidebarFolded(JSON.parse(savedSidebarFolded));
     }
-  }, []);
+  }, [selectedLanguage]);
 
   useEffect(() => {
     storageUtils.saveConversations(conversations);
@@ -58,7 +58,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Save sidebar folded state to localStorage
   useEffect(() => {
     localStorage.setItem('ai-tutor-sidebar-folded', JSON.stringify(sidebarFolded));
   }, [sidebarFolded]);
@@ -67,7 +66,7 @@ function App() {
     const newSettings = { ...settings, selectedModel: model };
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
-    aiService.updateSettings(newSettings);
+    aiService.updateSettings(newSettings, selectedLanguage);
   };
 
   const handleToggleSidebarFold = () => {
@@ -80,7 +79,7 @@ function App() {
   const handleNewConversation = () => {
     const newConversation: Conversation = {
       id: generateId(),
-      title: 'New Chat',
+      title: selectedLanguage === 'en' ? 'New Chat' : 'नवीन चॅट',
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -113,7 +112,7 @@ function App() {
   const handleSaveSettings = (newSettings: APISettings) => {
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
-    aiService.updateSettings(newSettings);
+    aiService.updateSettings(newSettings, selectedLanguage);
   };
 
   const handleInstallApp = async () => {
@@ -171,7 +170,7 @@ function App() {
         content: '',
         role: 'assistant',
         timestamp: new Date(),
-        model: settings.selectedModel, // Store the current model when creating the message
+        model: settings.selectedModel,
       };
 
       setStreamingMessage(assistantMessage);
@@ -186,7 +185,7 @@ function App() {
       }));
 
       let fullResponse = '';
-      for await (const chunk of aiService.generateStreamingResponse(messages)) {
+      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
@@ -235,15 +234,12 @@ function App() {
     if (!currentConversation) return;
     
     const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
-    if (messageIndex <= 0) return; // Can't regenerate if it's not an assistant message or first message
+    if (messageIndex <= 0) return;
     
-    // Find the user message that prompted this assistant response
     const userMessage = currentConversation.messages[messageIndex - 1];
     
-    // Remove the assistant message (and any messages after it)
     const updatedMessages = currentConversation.messages.slice(0, messageIndex);
     
-    // Update the conversation to remove the assistant response
     setConversations(prev => prev.map(conv => {
       if (conv.id === currentConversationId) {
         return {
@@ -255,7 +251,6 @@ function App() {
       return conv;
     }));
     
-    // Generate new response
     setIsLoading(true);
     try {
       const assistantMessage: Message = {
@@ -263,7 +258,7 @@ function App() {
         content: '',
         role: 'assistant',
         timestamp: new Date(),
-        model: settings.selectedModel, // Use current model for regeneration
+        model: settings.selectedModel,
       };
 
       setStreamingMessage(assistantMessage);
@@ -274,7 +269,7 @@ function App() {
       }));
 
       let fullResponse = '';
-      for await (const chunk of aiService.generateStreamingResponse(messages)) {
+      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
@@ -326,7 +321,7 @@ function App() {
         <button
           onClick={() => setSidebarOpen(true)}
           className="fixed top-4 left-4 p-2 bg-gray-600 dark:bg-gray-700 rounded-lg z-50 shadow-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
-          title="Open sidebar"
+          title={selectedLanguage === 'en' ? 'Open sidebar' : 'साइडबार उघडा'}
         >
           <Menu className="w-5 h-5 text-white" />
         </button>
@@ -350,7 +345,6 @@ function App() {
         onSaveSettings={handleSaveSettings}
       />
       
-      {/* PWA Install Prompt */}
       {isInstallable && !isInstalled && (
         <InstallPrompt
           onInstall={handleInstallApp}
