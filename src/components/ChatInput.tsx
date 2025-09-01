@@ -49,19 +49,17 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               rows={1}
             />
           </div>
-          <div className="flex-shrink-0 flex items-end">
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading || disabled}
-              className="flex items-center justify-center w-[52px] h-[52px] bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-sm"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading || disabled}
+            className="flex-shrink-0 flex items-center justify-center w-[52px] h-[52px] bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-sm self-end"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
         </div>
       </form>
       {disabled && (
