@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Plus, MessageSquare, Settings, Trash2, Bot, X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Plus, MessageSquare, Settings, Trash2, X, ChevronLeft, ChevronRight, Sparkles, Globe, Cloud, Code } from 'lucide-react';
 import { Conversation } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
 
@@ -134,7 +134,7 @@ export function Sidebar({
                   }`}
                   title="ZhipuAI"
                 >
-                  <Bot className="w-4 h-4" />
+                  <Globe className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     ZhipuAI
                   </span>
@@ -148,7 +148,7 @@ export function Sidebar({
                   }`}
                   title="Mistral Small"
                 >
-                  <Bot className="w-4 h-4" />
+                  <Cloud className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     Mistral
                   </span>
@@ -162,7 +162,7 @@ export function Sidebar({
                   }`}
                   title="Codestral"
                 >
-                  <Bot className="w-4 h-4" />
+                  <Code className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     Codestral
                   </span>
