@@ -14,6 +14,7 @@ interface ChatAreaProps {
   model?: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
   onEditMessage?: (messageId: string, newContent: string) => void;
   onRegenerateResponse?: (messageId: string) => void;
+  onStopGenerating: () => void;
 }
 
 export function ChatArea({ 
@@ -24,7 +25,8 @@ export function ChatArea({
   hasApiKey,
   model,
   onEditMessage,
-  onRegenerateResponse
+  onRegenerateResponse,
+  onStopGenerating
 }: ChatAreaProps) {
   const { selectedLanguage } = useContext(LanguageContext);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -169,6 +171,7 @@ export function ChatArea({
             onSendMessage={onSendMessage}
             isLoading={isLoading}
             disabled={!hasApiKey}
+            onStopGenerating={onStopGenerating}
           />
         </div>
       </div>
