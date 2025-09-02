@@ -15,7 +15,6 @@ class AIService {
 
   private initializeProviders() {
     if (!this.settings) return;
-
     if (this.settings.googleApiKey) {
       try {
         this.googleAI = new GoogleGenerativeAI(this.settings.googleApiKey);
@@ -23,7 +22,6 @@ class AIService {
         console.error('Failed to initialize Google AI:', error);
       }
     }
-
     if (this.settings.zhipuApiKey) {
       try {
         this.zhipuAI = { apiKey: this.settings.zhipuApiKey };
@@ -63,6 +61,9 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         yield* this.generateGoogleResponse(messages, systemPrompt, onUpdate);
       } else if (this.settings.selectedModel === 'zhipu' && this.zhipuAI) {
         yield* this.generateZhipuResponse(messages, systemPrompt, onUpdate);
+      } else if (this.settings.selectedModel.startsWith('mistral-')) {
+        const model = this.settings.selectedModel.split('-')[1] as 'small' | 'codestral';
+        yield* this.generateMistralResponse(messages, systemPrompt, model, onUpdate);
       } else {
         yield language === 'en'
           ? "Selected model is not available or API key is missing."
@@ -88,9 +89,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "गूगल एआय सुरू झाले नाही. कृपया आपली API की तपासा.";
       return;
     }
-
     try {
-      // Use the correct model name - gemini-1.5-flash is more reliable than gemini-pro
       const model = this.googleAI.getGenerativeModel({
         model: 'gemma-3-27b-it',
         generationConfig: {
@@ -100,25 +99,16 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           maxOutputTokens: 2048,
         },
       });
-
-      // Convert messages to Gemini format
       const history = messages.slice(0, -1).map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }],
       }));
-
-      // Start chat with history
       const chat = model.startChat({
         history: history,
       });
-
-      // Get the last message and combine with system prompt
       const lastMessage = messages[messages.length - 1];
       const prompt = `${systemPrompt}\n\nUser: ${lastMessage.content}`;
-
-      // Send message stream
       const result = await chat.sendMessageStream(prompt);
-
       let fullResponse = '';
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
@@ -128,21 +118,15 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           yield chunkText;
         }
       }
-
-      // Ensure we got a response
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "I apologize, but I couldn't generate a response. Please try again."
           : "मला माफ करा, पण मी प्रतिसाद तयार करू शकलो नाही. कृपया पुन्हा प्रयत्न करा.";
       }
-
     } catch (error) {
       console.error('Google AI API Error:', error);
-      
-      // Handle specific error types
       if (error instanceof Error) {
         const errorMsg = error.message.toLowerCase();
-        
         if (errorMsg.includes('api key') || errorMsg.includes('authentication')) {
           yield this.language === 'en'
             ? "Invalid API key. Please check your Google AI API key in settings."
@@ -179,12 +163,10 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "झिपूएआय योग्यरित्या कॉन्फिगर केलेले नाही.";
       return;
     }
-
     const messagesWithSystemPrompt = [
       { role: 'system', content: systemPrompt },
       ...messages,
     ];
-
     try {
       const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
         method: 'POST',
@@ -203,7 +185,6 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           max_tokens: 2048,
         }),
       });
-
       if (!response.ok) {
         const errorText = await response.text();
         yield this.language === 'en'
@@ -211,7 +192,6 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : `झिपूएआय API त्रुटी: ${response.status} ${response.statusText}. ${errorText}`;
         return;
       }
-
       const reader = response.body?.getReader();
       if (!reader) {
         yield this.language === 'en'
@@ -219,23 +199,18 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
         return;
       }
-
       const decoder = new TextDecoder();
       let fullResponse = '';
-      
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
-
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6).trim();
               if (data === '[DONE]') return;
-
               try {
                 const parsed = JSON.parse(data);
                 const content = parsed.choices?.[0]?.delta?.content;
@@ -245,7 +220,6 @@ If the user asks for a quiz, create a quiz question or practice problem based on
                   yield content;
                 }
               } catch (e) {
-                // Skip invalid JSON
                 console.warn('Failed to parse JSON:', data);
               }
             }
@@ -254,18 +228,102 @@ If the user asks for a quiz, create a quiz question or practice problem based on
       } finally {
         reader.releaseLock();
       }
-
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "No response received from ZhipuAI. Please try again."
           : "झिपूएआय कडून कोणताही प्रतिसाद मिळाला नाही. कृपया पुन्हा प्रयत्न करा.";
       }
-
     } catch (error) {
       console.error('ZhipuAI Error:', error);
       yield this.language === 'en'
         ? `ZhipuAI Error: ${error instanceof Error ? error.message : 'Unknown error'}`
         : `झिपूएआय त्रुटी: ${error instanceof Error ? error.message : 'अज्ञात त्रुटी'}`;
+    }
+  }
+
+  private async *generateMistralResponse(
+    messages: Array<{ role: string; content: string }>,
+    systemPrompt: string,
+    model: 'small' | 'codestral',
+    onUpdate?: (content: string) => void
+  ): AsyncGenerator<string, void, unknown> {
+    if (!this.settings?.mistralApiKey) {
+      yield this.language === 'en'
+        ? "Mistral AI is not properly configured."
+        : "मिस्ट्रल एआय योग्यरित्या कॉन्फिगर केलेले नाही.";
+      return;
+    }
+    try {
+      const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.settings.mistralApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model === 'small' ? 'mistral-small-latest' : 'codestral-latest',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages,
+          ],
+          stream: true,
+          temperature: 0.7,
+          max_tokens: 2048,
+        }),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        yield this.language === 'en'
+          ? `Mistral API Error: ${response.status} ${response.statusText}. ${errorText}`
+          : `मिस्ट्रल API त्रुटी: ${response.status} ${response.statusText}. ${errorText}`;
+        return;
+      }
+      const reader = response.body?.getReader();
+      if (!reader) {
+        yield this.language === 'en'
+          ? "Error: Unable to read response stream"
+          : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
+        return;
+      }
+      const decoder = new TextDecoder();
+      let fullResponse = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim();
+              if (data === '[DONE]') return;
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content;
+                if (content) {
+                  fullResponse += content;
+                  if (onUpdate) onUpdate(fullResponse);
+                  yield content;
+                }
+              } catch (e) {
+                console.warn('Failed to parse JSON:', data);
+              }
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock();
+      }
+      if (!fullResponse.trim()) {
+        yield this.language === 'en'
+          ? "No response received from Mistral. Please try again."
+          : "मिस्ट्रलकडून कोणताही प्रतिसाद मिळाला नाही. कृपया पुन्हा प्रयत्न करा.";
+      }
+    } catch (error) {
+      console.error('Mistral Error:', error);
+      yield this.language === 'en'
+        ? `Mistral Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        : `मिस्ट्रल त्रुटी: ${error instanceof Error ? error.message : 'अज्ञात त्रुटी'}`;
     }
   }
 
