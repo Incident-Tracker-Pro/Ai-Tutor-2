@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { Bot, SlidersHorizontal } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
-import { Message, APISettings } from '../types';
+import { Message } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
 
 interface ChatAreaProps {
@@ -14,15 +14,6 @@ interface ChatAreaProps {
   model?: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
   onEditMessage?: (messageId: string, newContent: string) => void;
   onRegenerateResponse?: (messageId: string) => void;
-  settings: APISettings;
-  onModelChange: (model: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral') => void;
-}
-
-const modelDisplayNames = {
-  'google': "Gemma",
-  'zhipu': "ZhipuAI",
-  'mistral-small': "Mistral",
-  'mistral-codestral': "Codestral",
 }
 
 export function ChatArea({ 
@@ -33,8 +24,7 @@ export function ChatArea({
   hasApiKey,
   model,
   onEditMessage,
-  onRegenerateResponse,
-  settings
+  onRegenerateResponse
 }: ChatAreaProps) {
   const { selectedLanguage } = useContext(LanguageContext);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -48,12 +38,6 @@ export function ChatArea({
       behavior: smooth ? 'smooth' : 'auto',
       block: 'end'
     });
-  };
-
-  const isNearBottom = () => {
-    if (!messagesContainerRef.current) return true;
-    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    return scrollHeight - scrollTop - clientHeight < 100;
   };
 
   const handleScroll = () => {
@@ -93,15 +77,6 @@ export function ChatArea({
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--color-bg)] relative">
-      <div className="absolute top-0 right-0 p-4 z-10">
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
-          <span className="text-sm font-semibold text-[var(--color-text-primary)]">
-            {modelDisplayNames[settings.selectedModel]}
-          </span>
-          <SlidersHorizontal className="w-4 h-4 text-[var(--color-text-secondary)]" />
-        </div>
-      </div>
-
       {allMessages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center max-w-md">
