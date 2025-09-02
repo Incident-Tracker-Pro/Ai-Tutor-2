@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { Bot } from 'lucide-react';
+import { Bot, SlidersHorizontal } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
-import { Message } from '../types';
+import { Message, APISettings } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
 
 interface ChatAreaProps {
@@ -11,9 +11,18 @@ interface ChatAreaProps {
   isLoading: boolean;
   streamingMessage?: Message | null;
   hasApiKey: boolean;
-  model?: 'google' | 'zhipu';
+  model?: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
   onEditMessage?: (messageId: string, newContent: string) => void;
   onRegenerateResponse?: (messageId: string) => void;
+  settings: APISettings;
+  onModelChange: (model: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral') => void;
+}
+
+const modelDisplayNames = {
+  'google': "Gemma",
+  'zhipu': "ZhipuAI",
+  'mistral-small': "Mistral",
+  'mistral-codestral': "Codestral",
 }
 
 export function ChatArea({ 
@@ -24,7 +33,8 @@ export function ChatArea({
   hasApiKey,
   model,
   onEditMessage,
-  onRegenerateResponse
+  onRegenerateResponse,
+  settings
 }: ChatAreaProps) {
   const { selectedLanguage } = useContext(LanguageContext);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -82,24 +92,33 @@ export function ChatArea({
   const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-white relative">
+    <div className="flex-1 flex flex-col h-full bg-[var(--color-bg)] relative">
+      <div className="absolute top-0 right-0 p-4 z-10">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)]">
+          <span className="text-sm font-semibold text-[var(--color-text-primary)]">
+            {modelDisplayNames[settings.selectedModel]}
+          </span>
+          <SlidersHorizontal className="w-4 h-4 text-[var(--color-text-secondary)]" />
+        </div>
+      </div>
+
       {allMessages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 transition-transform hover:scale-105">
-              <Bot className="w-8 h-8 text-blue-600" />
+            <div className="w-24 h-24 bg-[var(--color-card)] rounded-full flex items-center justify-center mx-auto mb-6">
+              <Bot className="w-12 h-12 text-[var(--color-text-primary)]" />
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-              {selectedLanguage === 'en' ? 'How can I help you today?' : 'मी तुम्हाला आज कशी मदत करू शकतो?'}
+            <h2 className="text-5xl font-bold text-[var(--color-text-primary)] mb-4">
+              {selectedLanguage === 'en' ? 'AI Tutor' : 'एआय शिक्षक'}
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[var(--color-text-secondary)] mb-6">
               {selectedLanguage === 'en'
-                ? "I'm your AI tutor, ready to help you learn and answer any questions you might have."
-                : 'मी तुमचा एआय शिक्षक आहे, तुम्हाला शिकण्यास आणि तुमच्या कोणत्याही प्रश्नांचे उत्तर देण्यास तयार आहे.'}
+                ? "How can I help you today?"
+                : 'मी तुम्हाला आज कशी मदत करू शकतो?'}
             </p>
             {!hasApiKey && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
-                <p className="text-sm text-yellow-800">
+              <div className="bg-yellow-900/50 border border-yellow-700/50 rounded-lg p-4 text-left">
+                <p className="text-sm text-yellow-300">
                   <strong>{selectedLanguage === 'en' ? 'Setup Required:' : 'सेटअप आवश्यक:'}</strong>{' '}
                   {selectedLanguage === 'en'
                     ? 'Please configure your API keys in Settings to start chatting.'
@@ -112,14 +131,14 @@ export function ChatArea({
       ) : (
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto scroll-smooth"
+          className="flex-1 overflow-y-auto"
           onScroll={handleScroll}
           style={{
             scrollBehavior: userScrolled ? 'auto' : 'smooth',
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          <div className="max-w-3xl mx-auto px-4 py-6">
+          <div className="max-w-3xl mx-auto px-4 py-6 pt-20">
             {allMessages.map((message, index) => (
               <div
                 key={message.id}
@@ -150,11 +169,11 @@ export function ChatArea({
             setShowScrollToBottom(false);
             scrollToBottom();
           }}
-          className="absolute bottom-20 right-6 bg-white border border-gray-300 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 z-10 hover:scale-105"
+          className="absolute bottom-24 right-6 bg-[var(--color-card)] border border-[var(--color-border)] rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-200 z-10 hover:scale-105"
           aria-label={selectedLanguage === 'en' ? 'Scroll to bottom' : 'खाली स्क्रोल करा'}
         >
           <svg
-            className="w-4 h-4 text-gray-600"
+            className="w-4 h-4 text-[var(--color-text-secondary)]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -169,7 +188,7 @@ export function ChatArea({
         </button>
       )}
       
-      <div className="border-t border-gray-200 p-4 bg-white/90 backdrop-blur-sm">
+      <div className="p-4 bg-[var(--color-bg)]">
         <div className="max-w-3xl mx-auto">
           <ChatInput
             onSendMessage={onSendMessage}
