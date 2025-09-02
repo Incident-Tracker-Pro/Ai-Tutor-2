@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -28,6 +28,7 @@ function App() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
+
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
   useEffect(() => {
@@ -39,6 +40,7 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
     aiService.updateSettings(savedSettings, selectedLanguage);
+
     const savedSidebarFolded = localStorage.getItem('ai-tutor-sidebar-folded');
     if (savedSidebarFolded) {
       setSidebarFolded(JSON.parse(savedSidebarFolded));
@@ -75,16 +77,13 @@ function App() {
   const currentConversation = conversations.find(c => c.id === currentConversationId);
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey || settings.mistralApiKey;
 
-  const handleNewConversation = (isDocumentChat: boolean = false) => {
+  const handleNewConversation = () => {
     const newConversation: Conversation = {
       id: generateId(),
-      title: isDocumentChat
-        ? (selectedLanguage === 'en' ? 'New Document Chat' : 'नवीन दस्तऐवज चॅट')
-        : (selectedLanguage === 'en' ? 'New Chat' : 'नवीन चॅट'),
+      title: selectedLanguage === 'en' ? 'New Chat' : 'नवीन चॅट',
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),
-      isDocumentChat,
     };
     setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
@@ -121,63 +120,6 @@ function App() {
     const success = await installApp();
     if (success) {
       console.log('App installed successfully');
-    }
-  };
-
-  const handleFileUpload = async (file: File) => {
-    if (!currentConversationId) return;
-
-    try {
-      let content = '';
-      if (file.type === 'application/pdf') {
-        // Use pdf-parse for PDF text extraction
-        const pdfParse = (await import('pdf-parse')).default;
-        const arrayBuffer = await file.arrayBuffer();
-        const data = await pdfParse(arrayBuffer);
-        content = data.text;
-      } else {
-        content = await file.text();
-      }
-
-      setConversations(prev =>
-        prev.map(conv =>
-          conv.id === currentConversationId
-            ? {
-                ...conv,
-                documentName: file.name,
-                messages: [
-                  ...conv.messages,
-                  {
-                    id: generateId(),
-                    content: `${selectedLanguage === 'en' ? 'Document uploaded:' : 'दस्तऐवज अपलोड केले:'} **${file.name}**\n\n${selectedLanguage === 'en' ? 'You can now ask questions about this document.' : 'तुम्ही आता या दस्तऐवजाबद्दल प्रश्न विचारण्यास सुरुवात करू शकता.'}`,
-                    role: 'assistant',
-                    timestamp: new Date(),
-                  },
-                ],
-              }
-            : conv
-        )
-      );
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      setConversations(prev =>
-        prev.map(conv =>
-          conv.id === currentConversationId
-            ? {
-                ...conv,
-                messages: [
-                  ...conv.messages,
-                  {
-                    id: generateId(),
-                    content: `${selectedLanguage === 'en' ? 'Error uploading document:' : 'दस्तऐवज अपलोड करण्यात त्रुटी:'} ${error instanceof Error ? error.message : 'Unknown error'}`,
-                    role: 'assistant',
-                    timestamp: new Date(),
-                  },
-                ],
-              }
-            : conv
-        )
-      );
     }
   };
 
@@ -223,7 +165,6 @@ function App() {
     }));
 
     setIsLoading(true);
-
     try {
       const assistantMessage: Message = {
         id: generateId(),
@@ -232,16 +173,11 @@ function App() {
         timestamp: new Date(),
         model: settings.selectedModel,
       };
-
       setStreamingMessage(assistantMessage);
 
       const conversationHistory = currentConversation
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
-
-      const documentContext = currentConversation?.isDocumentChat
-        ? `Use the following document context to answer the user's questions:\n\n${currentConversation.messages.find(m => m.role === 'assistant')?.content || ''}`
-        : undefined;
 
       const messages = conversationHistory.map(msg => ({
         role: msg.role,
@@ -249,7 +185,7 @@ function App() {
       }));
 
       let fullResponse = '';
-      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage, documentContext)) {
+      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
@@ -269,7 +205,6 @@ function App() {
         }
         return conv;
       }));
-
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -301,6 +236,7 @@ function App() {
     if (messageIndex <= 0) return;
 
     const userMessage = currentConversation.messages[messageIndex - 1];
+
     const updatedMessages = currentConversation.messages.slice(0, messageIndex);
 
     setConversations(prev => prev.map(conv => {
@@ -315,7 +251,6 @@ function App() {
     }));
 
     setIsLoading(true);
-
     try {
       const assistantMessage: Message = {
         id: generateId(),
@@ -324,12 +259,7 @@ function App() {
         timestamp: new Date(),
         model: settings.selectedModel,
       };
-
       setStreamingMessage(assistantMessage);
-
-      const documentContext = currentConversation.isDocumentChat
-        ? `Use the following document context to answer the user's questions:\n\n${currentConversation.messages.find(m => m.role === 'assistant')?.content || ''}`
-        : undefined;
 
       const messages = updatedMessages.map(msg => ({
         role: msg.role,
@@ -337,7 +267,7 @@ function App() {
       }));
 
       let fullResponse = '';
-      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage, documentContext)) {
+      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
@@ -357,7 +287,6 @@ function App() {
         }
         return conv;
       }));
-
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error regenerating response:', error);
@@ -404,8 +333,6 @@ function App() {
         model={settings.selectedModel}
         onEditMessage={handleEditMessage}
         onRegenerateResponse={handleRegenerateResponse}
-        currentConversation={currentConversation}
-        onFileUpload={handleFileUpload}
       />
 
       <SettingsModal
