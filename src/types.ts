@@ -15,6 +15,8 @@ export interface Conversation {
   createdAt: Date;
   updatedAt: Date;
   summary?: string;
+  isDocumentChat?: boolean;
+  documentName?: string;
 }
 
 export interface Note {
