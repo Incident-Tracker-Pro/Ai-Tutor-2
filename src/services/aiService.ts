@@ -34,6 +34,7 @@ class AIService {
   async *generateStreamingResponse(
     messages: Array<{ role: string; content: string }>,
     language: 'en' | 'mr',
+    documentContext?: string,
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.settings) {
@@ -43,18 +44,26 @@ class AIService {
       return;
     }
 
-    const systemPrompt = language === 'en'
+    const systemPrompt = documentContext
+      ? `${documentContext}\n\n${
+          language === 'en'
+            ? `You are a helpful AI tutor. Answer the user's questions based on the provided document context.
+              If the answer is not in the context, say "I couldn't find that information in the document."`
+            : `तुम्ही एक उपयुक्त एआय शिक्षक आहात. वापरकर्त्याच्या प्रश्नांची उत्तरे दस्तऐवज संदर्भावर आधारित द्या.
+              जर उत्तर संदर्भात नसेल, तर "मी दस्तऐवजात ही माहिती सापडली नाही." असे सांगा.`
+        }`
+      : language === 'en'
       ? `You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
-Use markdown formatting with headings, lists, and code blocks to structure your answers.
-If the user asks for examples, provide practical examples.
-If the user asks for explanations, break down complex concepts into simple terms.
-If the user asks for a quiz, create a quiz question or practice problem based on the topic.`
+          Use markdown formatting with headings, lists, and code blocks to structure your answers.
+          If the user asks for examples, provide practical examples.
+          If the user asks for explanations, break down complex concepts into simple terms.
+          If the user asks for a quiz, create a quiz question or practice problem based on the topic.`
       : `तुम्ही एक उपयुक्त एआय शिक्षक आहात. वापरकर्त्यांना प्रभावीपणे शिकण्यास मदत करण्यासाठी स्पष्ट, शैक्षणिक प्रतिसाद द्या.
-आपले उत्तर संरचित करण्यासाठी मार्कडाउन स्वरूपण, शीर्षके, यादी आणि कोड ब्लॉक वापरा.
-जर वापरकर्त्याने उदाहरणे मागितली, तर व्यावहारिक उदाहरणे द्या.
-जर वापरकर्त्याने स्पष्टीकरण मागितले, तर जटिल संकल्पना साध्या भाषेत समजावून सांगा.
-जर वापरकर्त्याने क्विझ मागितली, तर विषयावर आधारित क्विझ प्रश्न किंवा सराव समस्या तयार करा.
-सर्व प्रतिसाद मराठीत द्या.`;
+          आपले उत्तर संरचित करण्यासाठी मार्कडाउन स्वरूपण, शीर्षके, यादी आणि कोड ब्लॉक वापरा.
+          जर वापरकर्त्याने उदाहरणे मागितली, तर व्यावहारिक उदाहरणे द्या.
+          जर वापरकर्त्याने स्पष्टीकरण मागितले, तर जटिल संकल्पना साध्या भाषेत समजावून सांगा.
+          जर वापरकर्त्याने क्विझ मागितली, तर विषयावर आधारित क्विझ प्रश्न किंवा सराव समस्या तयार करा.
+          सर्व प्रतिसाद मराठीत द्या.`;
 
     try {
       if (this.settings.selectedModel === 'google' && this.googleAI) {
@@ -89,6 +98,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "गूगल एआय सुरू झाले नाही. कृपया आपली API की तपासा.";
       return;
     }
+
     try {
       const model = this.googleAI.getGenerativeModel({
         model: 'gemma-3-27b-it',
@@ -99,17 +109,22 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           maxOutputTokens: 2048,
         },
       });
+
       const history = messages.slice(0, -1).map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }],
       }));
+
       const chat = model.startChat({
         history: history,
       });
+
       const lastMessage = messages[messages.length - 1];
       const prompt = `${systemPrompt}\n\nUser: ${lastMessage.content}`;
+
       const result = await chat.sendMessageStream(prompt);
       let fullResponse = '';
+
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
         if (chunkText) {
@@ -118,6 +133,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           yield chunkText;
         }
       }
+
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "I apologize, but I couldn't generate a response. Please try again."
@@ -163,10 +179,12 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "झिपूएआय योग्यरित्या कॉन्फिगर केलेले नाही.";
       return;
     }
+
     const messagesWithSystemPrompt = [
       { role: 'system', content: systemPrompt },
       ...messages,
     ];
+
     try {
       const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
         method: 'POST',
@@ -185,6 +203,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           max_tokens: 2048,
         }),
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         yield this.language === 'en'
@@ -192,6 +211,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : `झिपूएआय API त्रुटी: ${response.status} ${response.statusText}. ${errorText}`;
         return;
       }
+
       const reader = response.body?.getReader();
       if (!reader) {
         yield this.language === 'en'
@@ -199,14 +219,17 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
         return;
       }
+
       const decoder = new TextDecoder();
       let fullResponse = '';
+
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
+
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6).trim();
@@ -228,6 +251,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
       } finally {
         reader.releaseLock();
       }
+
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "No response received from ZhipuAI. Please try again."
@@ -253,6 +277,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "मिस्ट्रल एआय योग्यरित्या कॉन्फिगर केलेले नाही.";
       return;
     }
+
     try {
       const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
         method: 'POST',
@@ -271,6 +296,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           max_tokens: 2048,
         }),
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         yield this.language === 'en'
@@ -278,6 +304,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : `मिस्ट्रल API त्रुटी: ${response.status} ${response.statusText}. ${errorText}`;
         return;
       }
+
       const reader = response.body?.getReader();
       if (!reader) {
         yield this.language === 'en'
@@ -285,14 +312,17 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
         return;
       }
+
       const decoder = new TextDecoder();
       let fullResponse = '';
+
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
+
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6).trim();
@@ -314,6 +344,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
       } finally {
         reader.releaseLock();
       }
+
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "No response received from Mistral. Please try again."
@@ -327,9 +358,9 @@ If the user asks for a quiz, create a quiz question or practice problem based on
     }
   }
 
-  async generateResponse(messages: Array<{ role: string; content: string }>): Promise<string> {
+  async generateResponse(messages: Array<{ role: string; content: string }>, documentContext?: string): Promise<string> {
     let fullResponse = '';
-    for await (const chunk of this.generateStreamingResponse(messages, this.language)) {
+    for await (const chunk of this.generateStreamingResponse(messages, this.language, documentContext)) {
       fullResponse += chunk;
     }
     return fullResponse;
