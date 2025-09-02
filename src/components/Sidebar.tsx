@@ -12,6 +12,7 @@ import {
   Brain,
   Cloud,
   Terminal,
+  FileText,
 } from 'lucide-react';
 import { Conversation } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
@@ -19,7 +20,7 @@ import { LanguageContext } from '../contexts/LanguageContext';
 interface SidebarProps {
   conversations: Conversation[];
   currentConversationId: string | null;
-  onNewConversation: () => void;
+  onNewConversation: (isDocumentChat?: boolean) => void;
   onSelectConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
   onOpenSettings: () => void;
@@ -44,6 +45,7 @@ export function Sidebar({
   onToggleFold,
 }: SidebarProps) {
   const { selectedLanguage } = useContext(LanguageContext);
+
   return (
     <div
       className={`${
@@ -114,8 +116,8 @@ export function Sidebar({
         {!isFolded && (
           <>
             <button
-              onClick={onNewConversation}
-              className={`w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-3 ${
+              onClick={() => onNewConversation()}
+              className={`w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-2 ${
                 selectedLanguage === 'mr' ? 'font-bold text-shadow' : ''
               }`}
               style={
@@ -133,6 +135,26 @@ export function Sidebar({
               </span>
             </button>
 
+            <button
+              onClick={() => onNewConversation(true)}
+              className={`w-full flex items-center gap-2 px-3 py-2 bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 rounded-lg transition-colors text-white border border-blue-600 dark:border-blue-600 shadow-sm font-medium mb-3 ${
+                selectedLanguage === 'mr' ? 'font-bold text-shadow' : ''
+              }`}
+              style={
+                selectedLanguage === 'mr'
+                  ? {
+                      textShadow: '0 0 1px rgba(255, 255, 255, 0.3)',
+                      fontWeight: '700',
+                    }
+                  : {}
+              }
+            >
+              <FileText className="w-4 h-4" />
+              <span className={selectedLanguage === 'mr' ? 'font-bold' : ''}>
+                {selectedLanguage === 'en' ? 'Chat with Document' : 'दस्तऐवजासह चॅट'}
+              </span>
+            </button>
+
             <div className="space-y-2">
               <p
                 className={`text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1 ${
@@ -142,7 +164,6 @@ export function Sidebar({
                 {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {/* Gemma (Google Gemini) */}
                 <button
                   onClick={() => onModelChange('google')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -157,8 +178,6 @@ export function Sidebar({
                     Gemma
                   </span>
                 </button>
-
-                {/* ZhipuAI */}
                 <button
                   onClick={() => onModelChange('zhipu')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -173,8 +192,6 @@ export function Sidebar({
                     ZhipuAI
                   </span>
                 </button>
-
-                {/* Mistral */}
                 <button
                   onClick={() => onModelChange('mistral-small')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -189,8 +206,6 @@ export function Sidebar({
                     Mistral
                   </span>
                 </button>
-
-                {/* Codestral */}
                 <button
                   onClick={() => onModelChange('mistral-codestral')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -213,11 +228,18 @@ export function Sidebar({
         {isFolded && (
           <div className="space-y-3">
             <button
-              onClick={onNewConversation}
+              onClick={() => onNewConversation()}
               className="w-full flex items-center justify-center p-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm"
               title={selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
             >
               <Plus className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onNewConversation(true)}
+              className="w-full flex items-center justify-center p-2 bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 rounded-lg transition-colors text-white border border-blue-600 dark:border-blue-600 shadow-sm"
+              title={selectedLanguage === 'en' ? 'Chat with Document' : 'दस्तऐवजासह चॅट'}
+            >
+              <FileText className="w-4 h-4" />
             </button>
             <button
               onClick={onOpenSettings}
@@ -258,7 +280,11 @@ export function Sidebar({
                   onClick={() => onSelectConversation(conversation.id)}
                   title={isFolded ? conversation.title : undefined}
                 >
-                  <MessageSquare className="w-4 h-4 flex-shrink-0 text-[var(--color-text-secondary)]" />
+                  {conversation.isDocumentChat ? (
+                    <FileText className="w-4 h-4 flex-shrink-0 text-blue-500" />
+                  ) : (
+                    <MessageSquare className="w-4 h-4 flex-shrink-0 text-[var(--color-text-secondary)]" />
+                  )}
                   {!isFolded && (
                     <>
                       <span
