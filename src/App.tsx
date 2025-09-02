@@ -28,6 +28,7 @@ function App() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
+
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
   useEffect(() => {
@@ -39,6 +40,7 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
     aiService.updateSettings(savedSettings, selectedLanguage);
+
     const savedSidebarFolded = localStorage.getItem('ai-tutor-sidebar-folded');
     if (savedSidebarFolded) {
       setSidebarFolded(JSON.parse(savedSidebarFolded));
@@ -72,7 +74,7 @@ function App() {
     setSidebarFolded(!sidebarFolded);
   };
 
-  const currentConversation = conversations.find((c) => c.id === currentConversationId);
+  const currentConversation = conversations.find(c => c.id === currentConversationId);
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey || settings.mistralApiKey;
 
   const handleNewConversation = () => {
@@ -83,7 +85,7 @@ function App() {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    setConversations((prev) => [newConversation, ...prev]);
+    setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
@@ -98,9 +100,9 @@ function App() {
   };
 
   const handleDeleteConversation = (id: string) => {
-    setConversations((prev) => prev.filter((c) => c.id !== id));
+    setConversations(prev => prev.filter(c => c.id !== id));
     if (currentConversationId === id) {
-      const remaining = conversations.filter((c) => c.id !== id);
+      const remaining = conversations.filter(c => c.id !== id);
       setCurrentConversationId(remaining.length > 0 ? remaining[0].id : null);
     }
     if (window.innerWidth < 768) {
@@ -121,11 +123,12 @@ function App() {
     }
   };
 
-  const handleSendMessage = async (content: string, files?: File[]) => {
+  const handleSendMessage = async (content: string) => {
     if (!hasApiKey) {
       setIsSettingsOpen(true);
       return;
     }
+
     let targetConversationId = currentConversationId;
     if (!targetConversationId) {
       const newConversation: Conversation = {
@@ -135,32 +138,32 @@ function App() {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      setConversations((prev) => [newConversation, ...prev]);
+      setConversations(prev => [newConversation, ...prev]);
       targetConversationId = newConversation.id;
       setCurrentConversationId(targetConversationId);
     }
+
     const userMessage: Message = {
       id: generateId(),
       content,
       role: 'user',
       timestamp: new Date(),
-      files: files?.map((file) => file.name),
     };
-    setConversations((prev) =>
-      prev.map((conv) => {
-        if (conv.id === targetConversationId) {
-          const updatedMessages = [...conv.messages, userMessage];
-          const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
-          return {
-            ...conv,
-            title: updatedTitle,
-            messages: updatedMessages,
-            updatedAt: new Date(),
-          };
-        }
-        return conv;
-      })
-    );
+
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === targetConversationId) {
+        const updatedMessages = [...conv.messages, userMessage];
+        const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
+        return {
+          ...conv,
+          title: updatedTitle,
+          messages: updatedMessages,
+          updatedAt: new Date(),
+        };
+      }
+      return conv;
+    }));
+
     setIsLoading(true);
     try {
       const assistantMessage: Message = {
@@ -171,34 +174,37 @@ function App() {
         model: settings.selectedModel,
       };
       setStreamingMessage(assistantMessage);
+
       const conversationHistory = currentConversation
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
-      const messages = conversationHistory.map((msg) => ({
+
+      const messages = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content,
       }));
+
       let fullResponse = '';
-      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage, files)) {
+      for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
         fullResponse += chunk;
-        setStreamingMessage((prev) => (prev ? { ...prev, content: fullResponse } : null));
+        setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
+
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
       };
-      setConversations((prev) =>
-        prev.map((conv) => {
-          if (conv.id === targetConversationId) {
-            return {
-              ...conv,
-              messages: [...conv.messages, finalAssistantMessage],
-              updatedAt: new Date(),
-            };
-          }
-          return conv;
-        })
-      );
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === targetConversationId) {
+          return {
+            ...conv,
+            messages: [...conv.messages, finalAssistantMessage],
+            updatedAt: new Date(),
+          };
+        }
+        return conv;
+      }));
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -209,38 +215,41 @@ function App() {
   };
 
   const handleEditMessage = (messageId: string, newContent: string) => {
-    setConversations((prev) =>
-      prev.map((conv) => {
-        if (conv.id === currentConversationId) {
-          return {
-            ...conv,
-            messages: conv.messages.map((msg) => (msg.id === messageId ? { ...msg, content: newContent } : msg)),
-            updatedAt: new Date(),
-          };
-        }
-        return conv;
-      })
-    );
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === currentConversationId) {
+        return {
+          ...conv,
+          messages: conv.messages.map(msg =>
+            msg.id === messageId ? { ...msg, content: newContent } : msg
+          ),
+          updatedAt: new Date(),
+        };
+      }
+      return conv;
+    }));
   };
 
   const handleRegenerateResponse = async (messageId: string) => {
     if (!currentConversation) return;
-    const messageIndex = currentConversation.messages.findIndex((m) => m.id === messageId);
+
+    const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
     if (messageIndex <= 0) return;
+
     const userMessage = currentConversation.messages[messageIndex - 1];
+
     const updatedMessages = currentConversation.messages.slice(0, messageIndex);
-    setConversations((prev) =>
-      prev.map((conv) => {
-        if (conv.id === currentConversationId) {
-          return {
-            ...conv,
-            messages: updatedMessages,
-            updatedAt: new Date(),
-          };
-        }
-        return conv;
-      })
-    );
+
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === currentConversationId) {
+        return {
+          ...conv,
+          messages: updatedMessages,
+          updatedAt: new Date(),
+        };
+      }
+      return conv;
+    }));
+
     setIsLoading(true);
     try {
       const assistantMessage: Message = {
@@ -251,31 +260,33 @@ function App() {
         model: settings.selectedModel,
       };
       setStreamingMessage(assistantMessage);
-      const messages = updatedMessages.map((msg) => ({
+
+      const messages = updatedMessages.map(msg => ({
         role: msg.role,
         content: msg.content,
       }));
+
       let fullResponse = '';
       for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
         fullResponse += chunk;
-        setStreamingMessage((prev) => (prev ? { ...prev, content: fullResponse } : null));
+        setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
+
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
       };
-      setConversations((prev) =>
-        prev.map((conv) => {
-          if (conv.id === currentConversationId) {
-            return {
-              ...conv,
-              messages: [...updatedMessages, finalAssistantMessage],
-              updatedAt: new Date(),
-            };
-          }
-          return conv;
-        })
-      );
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === currentConversationId) {
+          return {
+            ...conv,
+            messages: [...updatedMessages, finalAssistantMessage],
+            updatedAt: new Date(),
+          };
+        }
+        return conv;
+      }));
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error regenerating response:', error);
@@ -302,6 +313,7 @@ function App() {
           onToggleFold={handleToggleSidebarFold}
         />
       )}
+
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
@@ -311,6 +323,7 @@ function App() {
           <Menu className="w-5 h-5 text-white" />
         </button>
       )}
+
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
@@ -321,14 +334,19 @@ function App() {
         onEditMessage={handleEditMessage}
         onRegenerateResponse={handleRegenerateResponse}
       />
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onSaveSettings={handleSaveSettings}
       />
+
       {isInstallable && !isInstalled && (
-        <InstallPrompt onInstall={handleInstallApp} onDismiss={dismissInstallPrompt} />
+        <InstallPrompt
+          onInstall={handleInstallApp}
+          onDismiss={dismissInstallPrompt}
+        />
       )}
     </div>
   );
