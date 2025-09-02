@@ -1,5 +1,18 @@
 import React, { useContext } from 'react';
-import { Plus, MessageSquare, Settings, Trash2, X, ChevronLeft, ChevronRight, Sparkles, Globe, Cloud, Code } from 'lucide-react';
+import {
+  Plus,
+  MessageSquare,
+  Settings,
+  Trash2,
+  Bot,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  Globe,
+  Wind,
+  Code,
+} from 'lucide-react';
 import { Conversation } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
 
@@ -52,7 +65,11 @@ export function Sidebar({
             />
             <Bot className="w-6 h-6 text-gray-600 dark:text-gray-400 hidden" />
             {!isFolded && (
-              <h1 className={`text-lg font-semibold text-[var(--color-text-primary)] ${selectedLanguage === 'mr' ? 'font-bold' : ''}`}>
+              <h1
+                className={`text-lg font-semibold text-[var(--color-text-primary)] ${
+                  selectedLanguage === 'mr' ? 'font-bold' : ''
+                }`}
+              >
                 {selectedLanguage === 'en' ? 'AI Tutor' : 'एआय शिक्षक'}
               </h1>
             )}
@@ -71,7 +88,15 @@ export function Sidebar({
               <button
                 onClick={onToggleFold}
                 className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors hidden md:block"
-                title={selectedLanguage === 'en' ? (isFolded ? 'Expand sidebar' : 'Collapse sidebar') : (isFolded ? 'साइडबार विस्तृत करा' : 'साइडबार संकुचित करा')}
+                title={
+                  selectedLanguage === 'en'
+                    ? isFolded
+                      ? 'Expand sidebar'
+                      : 'Collapse sidebar'
+                    : isFolded
+                    ? 'साइडबार विस्तृत करा'
+                    : 'साइडबार संकुचित करा'
+                }
               >
                 {isFolded ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
               </button>
@@ -93,10 +118,14 @@ export function Sidebar({
               className={`w-full flex items-center gap-2 px-3 py-2 bg-gray-600 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 rounded-lg transition-colors text-white border border-gray-600 dark:border-gray-600 shadow-sm font-medium mb-3 ${
                 selectedLanguage === 'mr' ? 'font-bold text-shadow' : ''
               }`}
-              style={selectedLanguage === 'mr' ? {
-                textShadow: '0 0 1px rgba(255, 255, 255, 0.3)',
-                fontWeight: '700'
-              } : {}}
+              style={
+                selectedLanguage === 'mr'
+                  ? {
+                      textShadow: '0 0 1px rgba(255, 255, 255, 0.3)',
+                      fontWeight: '700',
+                    }
+                  : {}
+              }
             >
               <Plus className="w-4 h-4" />
               <span className={selectedLanguage === 'mr' ? 'font-bold' : ''}>
@@ -105,12 +134,15 @@ export function Sidebar({
             </button>
 
             <div className="space-y-2">
-              <p className={`text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1 ${
-                selectedLanguage === 'mr' ? 'font-semibold' : ''
-              }`}>
+              <p
+                className={`text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1 ${
+                  selectedLanguage === 'mr' ? 'font-semibold' : ''
+                }`}
+              >
                 {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
               <div className="grid grid-cols-2 gap-2">
+                {/* Google Gemini */}
                 <button
                   onClick={() => onModelChange('google')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -125,6 +157,8 @@ export function Sidebar({
                     Gemini
                   </span>
                 </button>
+
+                {/* ZhipuAI */}
                 <button
                   onClick={() => onModelChange('zhipu')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -139,6 +173,8 @@ export function Sidebar({
                     ZhipuAI
                   </span>
                 </button>
+
+                {/* Mistral */}
                 <button
                   onClick={() => onModelChange('mistral-small')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -148,11 +184,13 @@ export function Sidebar({
                   }`}
                   title="Mistral Small"
                 >
-                  <Cloud className="w-4 h-4" />
+                  <Wind className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     Mistral
                   </span>
                 </button>
+
+                {/* Codestral */}
                 <button
                   onClick={() => onModelChange('mistral-codestral')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -196,7 +234,9 @@ export function Sidebar({
         <div className="p-2">
           {conversations.length === 0 ? (
             <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
-              <MessageSquare className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2 text-[var(--color-text-secondary)]`} />
+              <MessageSquare
+                className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2 text-[var(--color-text-secondary)]`}
+              />
               {!isFolded && (
                 <p className={`text-sm font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                   {selectedLanguage === 'en' ? 'No conversations yet' : 'अद्याप कोणतेही संभाषण नाही'}
@@ -208,7 +248,9 @@ export function Sidebar({
               {conversations.map((conversation) => (
                 <div
                   key={conversation.id}
-                  className={`group flex items-center gap-2 ${isFolded ? 'justify-center p-2' : 'p-3'} rounded-lg cursor-pointer transition-colors ${
+                  className={`group flex items-center gap-2 ${
+                    isFolded ? 'justify-center p-2' : 'p-3'
+                  } rounded-lg cursor-pointer transition-colors ${
                     currentConversationId === conversation.id
                       ? 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
                       : 'hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -219,9 +261,11 @@ export function Sidebar({
                   <MessageSquare className="w-4 h-4 flex-shrink-0 text-[var(--color-text-secondary)]" />
                   {!isFolded && (
                     <>
-                      <span className={`flex-1 text-sm font-medium text-[var(--color-text-primary)] truncate ${
-                        selectedLanguage === 'mr' ? 'font-semibold' : ''
-                      }`}>
+                      <span
+                        className={`flex-1 text-sm font-medium text-[var(--color-text-primary)] truncate ${
+                          selectedLanguage === 'mr' ? 'font-semibold' : ''
+                        }`}
+                      >
                         {conversation.title}
                       </span>
                       <button
