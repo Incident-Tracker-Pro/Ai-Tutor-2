@@ -74,10 +74,10 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
         <button
           type="submit"
           disabled={!canSend}
-          className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200 ${
+          className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-200 transform ${
             !canSend
-              ? 'bg-transparent text-[var(--color-text-placeholder)] cursor-not-allowed'
-              : 'bg-[var(--color-text-primary)] text-[var(--color-bg)] hover:bg-[var(--color-accent-bg-hover)]'
+              ? 'bg-transparent text-[var(--color-text-placeholder)] cursor-not-allowed scale-95'
+              : 'bg-[var(--color-text-primary)] text-[var(--color-bg)] hover:bg-[var(--color-accent-bg-hover)] scale-100 hover:scale-105 active:scale-95'
           }`}
           title={selectedLanguage === 'en' ? 'Send message' : 'संदेश पाठवा'}
         >
