@@ -14,6 +14,7 @@ import { LanguageContext } from './contexts/LanguageContext';
 const defaultSettings: APISettings = {
   googleApiKey: '',
   zhipuApiKey: '',
+  mistralApiKey: '',
   selectedModel: 'google',
 };
 
@@ -27,7 +28,7 @@ function App() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
-  
+
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
   useEffect(() => {
@@ -39,7 +40,7 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
     aiService.updateSettings(savedSettings, selectedLanguage);
-    
+
     const savedSidebarFolded = localStorage.getItem('ai-tutor-sidebar-folded');
     if (savedSidebarFolded) {
       setSidebarFolded(JSON.parse(savedSidebarFolded));
@@ -62,7 +63,7 @@ function App() {
     localStorage.setItem('ai-tutor-sidebar-folded', JSON.stringify(sidebarFolded));
   }, [sidebarFolded]);
 
-  const handleModelChange = (model: 'google' | 'zhipu') => {
+  const handleModelChange = (model: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral') => {
     const newSettings = { ...settings, selectedModel: model };
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
@@ -74,7 +75,7 @@ function App() {
   };
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
-  const hasApiKey = settings.googleApiKey || settings.zhipuApiKey;
+  const hasApiKey = settings.googleApiKey || settings.zhipuApiKey || settings.mistralApiKey;
 
   const handleNewConversation = () => {
     const newConversation: Conversation = {
@@ -127,7 +128,7 @@ function App() {
       setIsSettingsOpen(true);
       return;
     }
-    
+
     let targetConversationId = currentConversationId;
     if (!targetConversationId) {
       const newConversation: Conversation = {
@@ -172,7 +173,6 @@ function App() {
         timestamp: new Date(),
         model: settings.selectedModel,
       };
-
       setStreamingMessage(assistantMessage);
 
       const conversationHistory = currentConversation
@@ -205,7 +205,6 @@ function App() {
         }
         return conv;
       }));
-
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -220,7 +219,7 @@ function App() {
       if (conv.id === currentConversationId) {
         return {
           ...conv,
-          messages: conv.messages.map(msg => 
+          messages: conv.messages.map(msg =>
             msg.id === messageId ? { ...msg, content: newContent } : msg
           ),
           updatedAt: new Date(),
@@ -232,14 +231,14 @@ function App() {
 
   const handleRegenerateResponse = async (messageId: string) => {
     if (!currentConversation) return;
-    
+
     const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
     if (messageIndex <= 0) return;
-    
+
     const userMessage = currentConversation.messages[messageIndex - 1];
-    
+
     const updatedMessages = currentConversation.messages.slice(0, messageIndex);
-    
+
     setConversations(prev => prev.map(conv => {
       if (conv.id === currentConversationId) {
         return {
@@ -250,7 +249,7 @@ function App() {
       }
       return conv;
     }));
-    
+
     setIsLoading(true);
     try {
       const assistantMessage: Message = {
@@ -260,7 +259,6 @@ function App() {
         timestamp: new Date(),
         model: settings.selectedModel,
       };
-
       setStreamingMessage(assistantMessage);
 
       const messages = updatedMessages.map(msg => ({
@@ -289,7 +287,6 @@ function App() {
         }
         return conv;
       }));
-
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error regenerating response:', error);
@@ -316,7 +313,7 @@ function App() {
           onToggleFold={handleToggleSidebarFold}
         />
       )}
-      
+
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
@@ -326,7 +323,7 @@ function App() {
           <Menu className="w-5 h-5 text-white" />
         </button>
       )}
-      
+
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
@@ -337,14 +334,14 @@ function App() {
         onEditMessage={handleEditMessage}
         onRegenerateResponse={handleRegenerateResponse}
       />
-      
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onSaveSettings={handleSaveSettings}
       />
-      
+
       {isInstallable && !isInstalled && (
         <InstallPrompt
           onInstall={handleInstallApp}
