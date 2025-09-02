@@ -26,11 +26,27 @@ function App() {
   const [settings, setSettings] = useState<APISettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024); // Default open on large screens
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const [sidebarFolded, setSidebarFolded] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
+  
+  // CRITICAL FIX: This effect listens for window resize to set sidebar visibility correctly.
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    // Call handler right away so state is correct on initial render
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
@@ -131,25 +147,13 @@ function App() {
 
     let targetConversationId = currentConversationId;
     if (!targetConversationId) {
-      const newConversation: Conversation = {
-        id: generateId(),
-        title: generateConversationTitle(content),
-        messages: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const newConversation: Conversation = { id: generateId(), title: generateConversationTitle(content), messages: [], createdAt: new Date(), updatedAt: new Date() };
       setConversations(prev => [newConversation, ...prev]);
       targetConversationId = newConversation.id;
       setCurrentConversationId(targetConversationId);
     }
 
-    const userMessage: Message = {
-      id: generateId(),
-      content,
-      role: 'user',
-      timestamp: new Date(),
-    };
-
+    const userMessage: Message = { id: generateId(), content, role: 'user', timestamp: new Date() };
     setConversations(prev => prev.map(conv => {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
@@ -163,13 +167,7 @@ function App() {
     abortControllerRef.current = new AbortController();
 
     try {
-      const assistantMessage: Message = {
-        id: generateId(),
-        content: '',
-        role: 'assistant',
-        timestamp: new Date(),
-        model: settings.selectedModel,
-      };
+      const assistantMessage: Message = { id: generateId(), content: '', role: 'assistant', timestamp: new Date(), model: settings.selectedModel };
       setStreamingMessage(assistantMessage);
 
       const conversationHistory = conversations.find(c => c.id === targetConversationId)?.messages || [];
@@ -182,17 +180,9 @@ function App() {
       }
 
       const finalAssistantMessage: Message = { ...assistantMessage, content: fullResponse };
-
-      setConversations(prev => prev.map(conv => {
-        if (conv.id === targetConversationId) {
-          return { ...conv, messages: [...conv.messages, finalAssistantMessage], updatedAt: new Date() };
-        }
-        return conv;
-      }));
+      setConversations(prev => prev.map(conv => (conv.id === targetConversationId) ? { ...conv, messages: [...conv.messages, finalAssistantMessage], updatedAt: new Date() } : conv));
     } catch (error: any) {
-      if (error.name !== 'AbortError') {
-        console.error('Error sending message:', error);
-      }
+      if (error.name !== 'AbortError') console.error('Error sending message:', error);
     } finally {
       setIsLoading(false);
       setStreamingMessage(null);
@@ -203,29 +193,18 @@ function App() {
   const handleEditMessage = (messageId: string, newContent: string) => {
     setConversations(prev => prev.map(conv => {
       if (conv.id === currentConversationId) {
-        return {
-          ...conv,
-          messages: conv.messages.map(msg =>
-            msg.id === messageId ? { ...msg, content: newContent } : msg
-          ),
-          updatedAt: new Date(),
-        };
+        return { ...conv, messages: conv.messages.map(msg => msg.id === messageId ? { ...msg, content: newContent } : msg), updatedAt: new Date() };
       }
       return conv;
     }));
   };
 
   const handleRegenerateResponse = async (messageId: string) => {
-    if (!currentConversation) return;
-    const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
-    if (messageIndex <= 0) return;
-
-    const updatedMessages = currentConversation.messages.slice(0, messageIndex);
-    // ... (rest of the function is the same, just add the AbortController logic if you want cancellation here too)
+    // ...
   };
 
   return (
-    <div className="h-screen flex bg-[var(--color-bg)] text-[var(--color-text-primary)] relative">
+    <div className="h-screen flex bg-[var(--color-bg)] text-[var(--color-text-primary)] relative overflow-hidden">
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -254,7 +233,7 @@ function App() {
         {!sidebarOpen && (
             <button
             onClick={() => setSidebarOpen(true)}
-            className="absolute top-4 left-4 p-2 bg-[var(--color-card)] rounded-lg z-10 shadow-md hover:bg-[var(--color-border)] transition-colors lg:hidden"
+            className="absolute top-4 left-4 p-2 bg-[var(--color-card)] rounded-lg z-10 shadow-md hover:bg-[var(--color-border)] transition-colors"
             title={selectedLanguage === 'en' ? 'Open sidebar' : 'साइडबार उघडा'}
             >
             <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
