@@ -38,6 +38,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
+
       resizeTimeoutRef.current = setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.style.height = 'auto';
@@ -82,19 +83,31 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={disabled ?
-                (selectedLanguage === 'en' ? 'Please configure API keys in Settings first...' : 'कृपया प्रथम सेटिंग्जमध्ये API की कॉन्फिगर करा...') :
+              placeholder={disabled ? 
+                (selectedLanguage === 'en' ? 'Please configure API keys in Settings first...' : 'कृपया प्रथम सेटिंग्जमध्ये API की कॉन्फिगर करा...') : 
                 (selectedLanguage === 'en' ? 'Send a message...' : 'संदेश पाठवा...')
               }
               disabled={disabled || isLoading}
-              className={`w-full min-h-[52px] max-h-[120px] p-3 pr-12 border rounded-lg resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium whitespace-pre-wrap break-words`}
+              className={`w-full min-h-[52px] max-h-[120px] p-3 pr-12 border rounded-lg resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium ${
+                disabled || isLoading
+                  ? 'border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+              }`}
               rows={1}
               style={{
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
               }}
             />
+            {input.length > 500 && (
+              <div className={`absolute bottom-2 right-16 text-xs transition-colors duration-200 ${
+                input.length > 1000 ? 'text-red-500' : 'text-gray-400'
+              }`}>
+                {input.length}/2000
+              </div>
+            )}
           </div>
+
           <div className="flex items-end pb-1">
             <button
               type="submit"
@@ -104,7 +117,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
                   ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed scale-95 opacity-60'
                   : 'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
               } text-white`}
-              title={selectedLanguage === 'en' ?
+              title={selectedLanguage === 'en' ? 
                 (!canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)') :
                 (!canSend ? (disabled ? 'प्रथम API की कॉन्फिगर करा' : 'संदेश प्रविष्ट करा') : 'संदेश पाठवा (Enter)')
               }
@@ -118,6 +131,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           </div>
         </div>
       </form>
+
       <div className={`transition-all duration-200 overflow-hidden ${
         disabled || input.length > 1500 ? 'max-h-10 mt-2 opacity-100' : 'max-h-0 opacity-0'
       }`}>
@@ -138,6 +152,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           </p>
         )}
       </div>
+
       {isFocused && !disabled && (
         <div className="mt-2 flex justify-center">
           <p className="text-xs text-gray-400 dark:text-gray-500 transition-opacity duration-200">
