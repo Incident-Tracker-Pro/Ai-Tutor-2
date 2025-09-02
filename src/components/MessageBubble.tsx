@@ -177,21 +177,45 @@ export function MessageBubble({
               components={{
                 code({ node, inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || '');
-                  return !inline && match ? (
-                    <SyntaxHighlighter
-                      style={oneDark}
-                      language={match[1]}
-                      PreTag="div"
-                      className="rounded-md my-2"
-                      {...props}
-                    >
-                      {String(children).replace(/\n$/, '')}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
-                      {children}
-                    </code>
-                  );
+                  if (!inline && match) {
+                    const [copied, setCopied] = useState(false);
+                    const codeContent = String(children).replace(/\n$/, '');
+                    const handleCopy = () => {
+                      navigator.clipboard.writeText(codeContent);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    };
+                    return (
+                      <div className="relative my-2">
+                        <button
+                          onClick={handleCopy}
+                          className="absolute right-2 top-2 p-1 bg-gray-700 rounded hover:bg-gray-600 text-white text-xs z-10"
+                          title={selectedLanguage === 'en' ? 'Copy code' : 'कोड कॉपी करा'}
+                        >
+                          {copied ? (
+                            <Check className="w-3 h-3" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
+                        </button>
+                        <SyntaxHighlighter
+                          style={oneDark}
+                          language={match[1]}
+                          PreTag="div"
+                          className="rounded-md"
+                          {...props}
+                        >
+                          {codeContent}
+                        </SyntaxHighlighter>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
+                        {children}
+                      </code>
+                    );
+                  }
                 },
                 table({ children }) {
                   return (
