@@ -5,7 +5,7 @@ export interface Message {
   timestamp: Date;
   isEditing?: boolean;
   originalContent?: string;
-  model?: 'google' | 'zhipu'; // Store which model generated this message
+  model?: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
 }
 
 export interface Conversation {
@@ -28,7 +28,8 @@ export interface Note {
 export interface APISettings {
   googleApiKey: string;
   zhipuApiKey: string;
-  selectedModel: 'google' | 'zhipu';
+  mistralApiKey: string;
+  selectedModel: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
 }
 
 export interface StudySession {
@@ -51,4 +52,4 @@ export interface StudyQuestion {
   explanation?: string;
 }
 
-export type ModelProvider = 'google' | 'zhipu';
+export type ModelProvider = 'google' | 'zhipu' | 'mistral';
