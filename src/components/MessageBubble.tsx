@@ -114,7 +114,7 @@ export function MessageBubble({
         </div>
       )}
       <div
-        className={`relative max-w-[85%] ${ isUser ? 'bg-[var(--color-card)] p-4 rounded-xl' : '' }`}
+        className="relative max-w-[85%] bg-[var(--color-card)] p-4 rounded-xl"
       >
         {!isUser && displayModel && (
           <div className="text-sm text-[var(--color-text-primary)] mb-2 font-semibold">
