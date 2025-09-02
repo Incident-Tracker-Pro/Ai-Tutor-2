@@ -4,10 +4,13 @@ import {
   MessageSquare,
   Settings,
   Trash2,
-  Bot,
   X,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
+  Brain,
+  Cloud,
+  Terminal,
 } from 'lucide-react';
 import { Conversation } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
@@ -19,6 +22,8 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
   onOpenSettings: () => void;
+  settings: { selectedModel: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' };
+  onModelChange: (model: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral') => void;
   onCloseSidebar: () => void;
   isFolded?: boolean;
   onToggleFold?: () => void;
@@ -31,6 +36,8 @@ export function Sidebar({
   onSelectConversation,
   onDeleteConversation,
   onOpenSettings,
+  settings,
+  onModelChange,
   onCloseSidebar,
   isFolded = false,
   onToggleFold,
@@ -103,65 +110,93 @@ export function Sidebar({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-2">
-          {conversations.length === 0 ? (
-            <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
-              <MessageSquare
-                className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2 text-[var(--color-text-secondary)]`}
-              />
-              {!isFolded && (
-                <p className={`text-sm font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                  {selectedLanguage === 'en' ? 'No conversations yet' : 'अद्याप कोणतेही संभाषण नाही'}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {conversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={`group flex items-center gap-2 ${
-                    isFolded ? 'justify-center p-2' : 'p-3'
-                  } rounded-lg cursor-pointer transition-colors ${
-                    currentConversationId === conversation.id
-                      ? 'bg-[var(--color-accent-bg)] text-[var(--color-accent-text)]'
-                      : 'hover:bg-[var(--color-card)] text-[var(--color-text-primary)]'
+      <div className="flex-1 overflow-y-auto p-2">
+        {!isFolded && (
+          <div className="space-y-2 mb-4">
+            <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider px-1">
+              {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'google', icon: Sparkles, name: 'Gemma' },
+                { id: 'zhipu', icon: Brain, name: 'ZhipuAI' },
+                { id: 'mistral-small', icon: Cloud, name: 'Mistral' },
+                { id: 'mistral-codestral', icon: Terminal, name: 'Codestral' },
+              ].map(model => (
+                <button
+                  key={model.id}
+                  onClick={() => onModelChange(model.id as any)}
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all border ${
+                    settings.selectedModel === model.id
+                      ? 'bg-[var(--color-card)] border-[var(--color-border)] text-white'
+                      : 'bg-transparent border-transparent hover:bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:text-white'
                   }`}
-                  onClick={() => onSelectConversation(conversation.id)}
-                  title={isFolded ? conversation.title : undefined}
+                  title={model.name}
                 >
-                  <MessageSquare className="w-4 h-4 flex-shrink-0" />
-                  {!isFolded && (
-                    <>
-                      <span
-                        className={`flex-1 text-sm font-semibold truncate ${
-                          selectedLanguage === 'mr' ? 'font-bold' : ''
-                        }`}
-                      >
-                        {conversation.title}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteConversation(conversation.id);
-                        }}
-                        className={`opacity-0 group-hover:opacity-100 p-1 rounded transition-all ${
-                          currentConversationId === conversation.id
-                            ? 'hover:bg-black/10'
-                            : 'hover:bg-red-900/30 text-red-400'
-                        }`}
-                        title={selectedLanguage === 'en' ? 'Delete conversation' : 'संभाषण हटवा'}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </>
-                  )}
-                </div>
+                  <model.icon className="w-4 h-4" />
+                  <span className="text-xs font-semibold">{model.name}</span>
+                </button>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {conversations.length === 0 ? (
+          <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
+            <MessageSquare
+              className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2 text-[var(--color-text-secondary)]`}
+            />
+            {!isFolded && (
+              <p className={`text-sm font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
+                {selectedLanguage === 'en' ? 'No conversations yet' : 'अद्याप कोणतेही संभाषण नाही'}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {conversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                className={`group flex items-center gap-2 ${
+                  isFolded ? 'justify-center p-2' : 'p-3'
+                } rounded-lg cursor-pointer transition-colors ${
+                  currentConversationId === conversation.id
+                    ? 'bg-[var(--color-accent-bg)] text-[var(--color-accent-text)]'
+                    : 'hover:bg-[var(--color-card)] text-[var(--color-text-primary)]'
+                }`}
+                onClick={() => onSelectConversation(conversation.id)}
+                title={isFolded ? conversation.title : undefined}
+              >
+                <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                {!isFolded && (
+                  <>
+                    <span
+                      className={`flex-1 text-sm font-semibold truncate ${
+                        selectedLanguage === 'mr' ? 'font-bold' : ''
+                      }`}
+                    >
+                      {conversation.title}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteConversation(conversation.id);
+                      }}
+                      className={`opacity-0 group-hover:opacity-100 p-1 rounded transition-all ${
+                        currentConversationId === conversation.id
+                          ? 'hover:bg-black/10'
+                          : 'hover:bg-red-900/30 text-red-400'
+                      }`}
+                      title={selectedLanguage === 'en' ? 'Delete conversation' : 'संभाषण हटवा'}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
