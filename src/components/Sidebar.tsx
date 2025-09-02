@@ -110,10 +110,10 @@ export function Sidebar({
               }`}>
                 {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
-              <div className="grid grid-cols-4 gap-1">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => onModelChange('google')}
-                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                     settings.selectedModel === 'google'
                       ? 'bg-blue-100 dark:bg-blue-900/30 border border-blue-500 text-blue-700 dark:text-blue-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
@@ -127,7 +127,7 @@ export function Sidebar({
                 </button>
                 <button
                   onClick={() => onModelChange('zhipu')}
-                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                     settings.selectedModel === 'zhipu'
                       ? 'bg-purple-100 dark:bg-purple-900/30 border border-purple-500 text-purple-700 dark:text-purple-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
@@ -141,7 +141,7 @@ export function Sidebar({
                 </button>
                 <button
                   onClick={() => onModelChange('mistral-small')}
-                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                     settings.selectedModel === 'mistral-small'
                       ? 'bg-green-100 dark:bg-green-900/30 border border-green-500 text-green-700 dark:text-green-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
@@ -155,7 +155,7 @@ export function Sidebar({
                 </button>
                 <button
                   onClick={() => onModelChange('mistral-codestral')}
-                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                     settings.selectedModel === 'mistral-codestral'
                       ? 'bg-orange-100 dark:bg-orange-900/30 border border-orange-500 text-orange-700 dark:text-orange-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
