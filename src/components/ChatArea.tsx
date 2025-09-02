@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { Bot, Sparkles, Brain, Zap } from 'lucide-react';
+import { Bot, ArrowDown } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 import { Message } from '../types';
@@ -81,126 +81,85 @@ export function ChatArea({
 
   const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
 
-  const getModelIcon = () => {
-    switch (model) {
-      case 'google':
-        return <Sparkles className="w-8 h-8 text-blue-500" />;
-      case 'zhipu':
-        return <Brain className="w-8 h-8 text-purple-500" />;
-      case 'mistral-small':
-        return <Zap className="w-8 h-8 text-green-500" />;
-      case 'mistral-codestral':
-        return <Bot className="w-8 h-8 text-orange-500" />;
-      default:
-        return <Bot className="w-8 h-8 text-blue-500" />;
-    }
-  };
-
-  const getModelName = () => {
-    const names = {
-      google: { en: "Gemma Ma'am", mr: "जेम्मा मॅम" },
-      zhipu: { en: "Zhipu Sir", mr: "झिपू सर" },
-      'mistral-small': { en: "Misty Miss", mr: "मिस्टी मिस" },
-      'mistral-codestral': { en: "Cody Guru", mr: "कोडी गुरु" },
-    };
-    return names[model || 'google'][selectedLanguage];
-  };
-
   return (
-    <div className="flex-1 flex flex-col h-full bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl relative border-l border-white/20 dark:border-gray-700/30">
+    <div className="chat-container flex-1 relative">
       {allMessages.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center max-w-2xl">
-            {/* Animated AI Avatar */}
-            <div className="relative mx-auto mb-8 w-24 h-24">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-full animate-pulse opacity-75"></div>
-              <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-full flex items-center justify-center w-full h-full shadow-2xl border border-white/30 hover:scale-110 transition-all duration-500">
-                {getModelIcon()}
-              </div>
-              {/* Floating particles */}
-              <div className="absolute -inset-4">
-                <div className="absolute top-2 right-2 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
-                <div className="absolute bottom-3 left-1 w-1.5 h-1.5 bg-purple-400 rounded-full animate-ping animation-delay-1000"></div>
-                <div className="absolute top-1/2 -right-2 w-1 h-1 bg-pink-400 rounded-full animate-ping animation-delay-2000"></div>
-              </div>
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="text-center max-w-md animate-fade-in">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg">
+              <Bot className="w-10 h-10 text-white" />
             </div>
+            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-4 text-gradient">
+              {selectedLanguage === 'en' ? 'AI Tutor' : 'एआय शिक्षक'}
+            </h1>
+            <p className="text-lg text-[var(--color-text-secondary)] mb-8 leading-relaxed">
+              {selectedLanguage === 'en'
+                ? "Your intelligent learning companion. Ask me anything and let's explore knowledge together."
+                : 'तुमचा बुद्धिमान शिक्षण साथीदार. मला काहीही विचारा आणि चला एकत्र ज्ञान एक्सप्लोर करूया.'}
+            </p>
+            
+            {!hasApiKey && (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-6 max-w-sm mx-auto">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold text-amber-200">
+                    {selectedLanguage === 'en' ? 'Setup Required' : 'सेटअप आवश्यक'}
+                  </h3>
+                </div>
+                <p className="text-sm text-amber-200/80 text-left">
+                  {selectedLanguage === 'en'
+                    ? 'Please configure your API keys in Settings to start chatting with AI models.'
+                    : 'एआय मॉडेल्ससह चॅटिंग सुरू करण्यासाठी कृपया सेटिंग्जमध्ये आपली API की कॉन्फिगर करा.'}
+                </p>
+              </div>
+            )}
 
-            {/* Welcome Message */}
-            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/30 dark:border-gray-700/30">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                {selectedLanguage === 'en' ? `Hello! I'm ${getModelName()}` : `नमस्कार! मी ${getModelName()} आहे`}
-              </h1>
-              <p className="text-xl text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                {selectedLanguage === 'en'
-                  ? "I'm your AI learning companion, ready to help you explore, understand, and master any topic. Let's start this journey together!"
-                  : 'मी तुमचा एआय शिक्षण साथीदार आहे, तुम्हाला कोणताही विषय एक्सप्लोर करण्यास, समजून घेण्यास आणि मास्टर करण्यास मदत करण्यास तयार आहे. चला हा प्रवास एकत्र सुरू करूया!'}
-              </p>
-              
-              {/* Feature highlights */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="flex items-center gap-3 p-3 bg-blue-50/50 dark:bg-blue-900/20 rounded-2xl">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
-                    <Brain className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                    {selectedLanguage === 'en' ? 'Smart Learning' : 'स्मार्ट लर्निंग'}
-                  </span>
+            {hasApiKey && (
+              <div className="space-y-4">
+                <div className="text-sm text-[var(--color-text-muted)] font-medium">
+                  {selectedLanguage === 'en' ? 'Try asking me about:' : 'मला याबद्दल विचारून पहा:'}
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-purple-50/50 dark:bg-purple-900/20 rounded-2xl">
-                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                    {selectedLanguage === 'en' ? 'Creative Thinking' : 'सर्जनशील विचार'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-pink-50/50 dark:bg-pink-900/20 rounded-2xl">
-                  <div className="w-8 h-8 bg-pink-100 dark:bg-pink-800 rounded-full flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-pink-600 dark:text-pink-400" />
-                  </div>
-                  <span className="text-sm font-medium text-pink-700 dark:text-pink-300">
-                    {selectedLanguage === 'en' ? 'Quick Responses' : 'जलद प्रतिसाद'}
-                  </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    selectedLanguage === 'en' ? 'Explain a complex topic' : 'जटिल विषय समजावून सांगा',
+                    selectedLanguage === 'en' ? 'Help with homework' : 'होमवर्कमध्ये मदत करा',
+                    selectedLanguage === 'en' ? 'Generate creative content' : 'सर्जनशील सामग्री तयार करा',
+                    selectedLanguage === 'en' ? 'Solve math problems' : 'गणित समस्या सोडवा'
+                  ].map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => onSendMessage(suggestion)}
+                      className="text-left p-3 bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-light)] transition-all duration-200 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
                 </div>
               </div>
-              
-              {!hasApiKey && (
-                <div className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 backdrop-blur-sm">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 bg-amber-200 dark:bg-amber-800 rounded-full flex items-center justify-center">
-                      <Zap className="w-4 h-4 text-amber-700 dark:text-amber-300" />
-                    </div>
-                    <h3 className="font-semibold text-amber-800 dark:text-amber-200">
-                      {selectedLanguage === 'en' ? 'Setup Required' : 'सेटअप आवश्यक'}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-                    {selectedLanguage === 'en'
-                      ? 'Please configure your API keys in Settings to unlock the full potential of your AI tutor and start having amazing conversations!'
-                      : 'कृपया तुमच्या एआय शिक्षकाची पूर्ण क्षमता अनलॉक करण्यासाठी आणि अद्भुत संभाषण सुरू करण्यासाठी सेटिंग्जमध्ये आपली API की कॉन्फिगर करा!'}
-                  </p>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       ) : (
         <div
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto scroll-smooth messages-container"
+          className="chat-messages flex-1 overflow-y-auto"
           onScroll={handleScroll}
           style={{
             scrollBehavior: userScrolled ? 'auto' : 'smooth',
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="max-w-4xl mx-auto space-y-6">
             {allMessages.map((message, index) => (
               <div
                 key={message.id}
-                className={`transition-all duration-500 ease-out transform ${
+                className={`animate-slide-in-bottom ${
                   index === allMessages.length - 1 && streamingMessage?.id === message.id
-                    ? 'animate-in slide-in-from-bottom-2 fade-in-0'
+                    ? 'animate-slide-in-bottom'
                     : ''
                 }`}
               >
@@ -213,11 +172,34 @@ export function ChatArea({
                 />
               </div>
             ))}
+            {isLoading && !streamingMessage && (
+              <div className="animate-slide-in-bottom">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="bg-[var(--color-message-assistant)] rounded-xl p-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-[var(--color-text-muted)] rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 bg-[var(--color-text-muted)] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                          <div className="w-2 h-2 bg-[var(--color-text-muted)] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                        </div>
+                        <span className="text-[var(--color-text-muted)] text-sm">
+                          {selectedLanguage === 'en' ? 'Thinking...' : 'विचार करत आहे...'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           <div ref={messagesEndRef} />
         </div>
       )}
-      
+
       {showScrollToBottom && (
         <button
           onClick={() => {
@@ -225,26 +207,14 @@ export function ChatArea({
             setShowScrollToBottom(false);
             scrollToBottom();
           }}
-          className="absolute bottom-24 right-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/30 rounded-full p-3 shadow-2xl hover:shadow-xl transition-all duration-300 z-10 hover:scale-110 group"
+          className="absolute bottom-24 right-6 w-10 h-10 bg-[var(--color-card)] border border-[var(--color-border)] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 z-10 hover:border-[var(--color-accent)]"
           aria-label={selectedLanguage === 'en' ? 'Scroll to bottom' : 'खाली स्क्रोल करा'}
         >
-          <svg
-            className="w-5 h-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
+          <ArrowDown className="w-4 h-4 text-[var(--color-text-secondary)]" />
         </button>
       )}
 
-      <div className="border-t border-white/20 dark:border-gray-700/30 p-4 bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl">
+      <div className="chat-input-container">
         <div className="max-w-4xl mx-auto">
           <ChatInput
             onSendMessage={onSendMessage}
@@ -253,27 +223,6 @@ export function ChatArea({
           />
         </div>
       </div>
-      
-      {/* CSS for custom animations */}
-      <style jsx>{`
-        .animation-delay-1000 {
-          animation-delay: 1s;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        @keyframes ping {
-          75%, 100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-        
-        .animate-ping {
-          animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-      `}</style>
     </div>
   );
 }
