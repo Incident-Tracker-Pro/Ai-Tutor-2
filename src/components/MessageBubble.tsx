@@ -128,7 +128,7 @@ export function MessageBubble({
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full min-h-[100px] p-3 border border-[var(--color-border)] rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[var(--color-card)] text-[var(--color-text-primary)] font-medium"
+              className="w-full min-h-[120px] p-3 border border-[var(--color-border)] rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[var(--color-bg)] text-[var(--color-text-primary)] font-normal"
               placeholder={selectedLanguage === 'en' ? 'Edit your message...' : 'आपला संदेश संपादित करा...'}
             />
             <div className="flex gap-2 justify-end">
@@ -155,7 +155,7 @@ export function MessageBubble({
             </p>
           </div>
         ) : (
-          <div className={`prose prose-invert prose-base max-w-none leading-relaxed font-medium`}>
+          <div className={`prose prose-invert prose-base max-w-none leading-relaxed font-normal`}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -198,7 +198,7 @@ export function MessageBubble({
                     );
                   } else {
                     return (
-                      <code className="bg-[var(--color-card)] px-1.5 py-0.5 rounded text-sm" {...props}>
+                      <code className="bg-[var(--color-bg)] px-1.5 py-0.5 rounded text-sm" {...props}>
                         {children}
                       </code>
                     );
@@ -215,7 +215,7 @@ export function MessageBubble({
                 },
                 th({ children }) {
                   return (
-                    <th className="border border-[var(--color-border)] p-2 bg-[var(--color-card)] font-semibold">
+                    <th className="border border-[var(--color-border)] p-2 bg-[var(--color-sidebar)] font-semibold">
                       {children}
                     </th>
                   );
@@ -265,8 +265,8 @@ export function MessageBubble({
         )}
       </div>
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-indigo-600">
-          <Smile className="w-4 h-4 text-white" />
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-card)]">
+          <Smile className="w-4 h-4 text-[var(--color-text-secondary)]" />
         </div>
       )}
     </div>
