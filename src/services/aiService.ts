@@ -31,9 +31,19 @@ class AIService {
     }
   }
 
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
   async *generateStreamingResponse(
     messages: Array<{ role: string; content: string }>,
     language: 'en' | 'mr',
+    files?: File[],
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.settings) {
@@ -58,12 +68,12 @@ If the user asks for a quiz, create a quiz question or practice problem based on
 
     try {
       if (this.settings.selectedModel === 'google' && this.googleAI) {
-        yield* this.generateGoogleResponse(messages, systemPrompt, onUpdate);
+        yield* this.generateGoogleResponse(messages, systemPrompt, files, onUpdate);
       } else if (this.settings.selectedModel === 'zhipu' && this.zhipuAI) {
-        yield* this.generateZhipuResponse(messages, systemPrompt, onUpdate);
+        yield* this.generateZhipuResponse(messages, systemPrompt, files, onUpdate);
       } else if (this.settings.selectedModel.startsWith('mistral-')) {
         const model = this.settings.selectedModel.split('-')[1] as 'small' | 'codestral';
-        yield* this.generateMistralResponse(messages, systemPrompt, model, onUpdate);
+        yield* this.generateMistralResponse(messages, systemPrompt, model, files, onUpdate);
       } else {
         yield language === 'en'
           ? "Selected model is not available or API key is missing."
@@ -81,6 +91,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
   private async *generateGoogleResponse(
     messages: Array<{ role: string; content: string }>,
     systemPrompt: string,
+    files?: File[],
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.googleAI) {
@@ -89,6 +100,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "गूगल एआय सुरू झाले नाही. कृपया आपली API की तपासा.";
       return;
     }
+
     try {
       const model = this.googleAI.getGenerativeModel({
         model: 'gemma-3-27b-it',
@@ -99,16 +111,39 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           maxOutputTokens: 2048,
         },
       });
+
       const history = messages.slice(0, -1).map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }],
       }));
+
       const chat = model.startChat({
         history: history,
       });
+
       const lastMessage = messages[messages.length - 1];
       const prompt = `${systemPrompt}\n\nUser: ${lastMessage.content}`;
-      const result = await chat.sendMessageStream(prompt);
+
+      let fileParts: Array<{ inlineData: { mimeType: string; data: string } }> = [];
+
+      if (files && files.length > 0) {
+        fileParts = await Promise.all(
+          files.map(async (file) => ({
+            inlineData: {
+              mimeType: file.type,
+              data: (await this.fileToBase64(file)).split(',')[1],
+            },
+          }))
+        );
+      }
+
+      const result = await chat.sendMessageStream({
+        content: [
+          { text: prompt },
+          ...fileParts,
+        ],
+      });
+
       let fullResponse = '';
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
@@ -118,6 +153,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           yield chunkText;
         }
       }
+
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "I apologize, but I couldn't generate a response. Please try again."
@@ -155,6 +191,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
   private async *generateZhipuResponse(
     messages: Array<{ role: string; content: string }>,
     systemPrompt: string,
+    files?: File[],
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.zhipuAI?.apiKey) {
@@ -163,28 +200,34 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "झिपूएआय योग्यरित्या कॉन्फिगर केलेले नाही.";
       return;
     }
+
     const messagesWithSystemPrompt = [
       { role: 'system', content: systemPrompt },
       ...messages,
     ];
+
     try {
+      const formData = new FormData();
+      formData.append('model', 'GLM-4.5-Flash');
+      formData.append('messages', JSON.stringify(messagesWithSystemPrompt));
+      formData.append('stream', 'true');
+      formData.append('temperature', '0.7');
+      formData.append('max_tokens', '2048');
+
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append('files', file);
+        });
+      }
+
       const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.zhipuAI.apiKey}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'GLM-4.5-Flash',
-          messages: messagesWithSystemPrompt.map(msg => ({
-            role: msg.role,
-            content: msg.content,
-          })),
-          stream: true,
-          temperature: 0.7,
-          max_tokens: 2048,
-        }),
+        body: formData,
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         yield this.language === 'en'
@@ -192,6 +235,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : `झिपूएआय API त्रुटी: ${response.status} ${response.statusText}. ${errorText}`;
         return;
       }
+
       const reader = response.body?.getReader();
       if (!reader) {
         yield this.language === 'en'
@@ -199,6 +243,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
         return;
       }
+
       const decoder = new TextDecoder();
       let fullResponse = '';
       try {
@@ -228,6 +273,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
       } finally {
         reader.releaseLock();
       }
+
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "No response received from ZhipuAI. Please try again."
@@ -245,6 +291,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
     messages: Array<{ role: string; content: string }>,
     systemPrompt: string,
     model: 'small' | 'codestral',
+    files?: File[],
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.settings?.mistralApiKey) {
@@ -253,24 +300,32 @@ If the user asks for a quiz, create a quiz question or practice problem based on
         : "मिस्ट्रल एआय योग्यरित्या कॉन्फिगर केलेले नाही.";
       return;
     }
+
     try {
+      const formData = new FormData();
+      formData.append('model', model === 'small' ? 'mistral-small-latest' : 'codestral-latest');
+      formData.append('messages', JSON.stringify([
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ]));
+      formData.append('stream', 'true');
+      formData.append('temperature', '0.7');
+      formData.append('max_tokens', '2048');
+
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append('files', file);
+        });
+      }
+
       const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.settings.mistralApiKey}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: model === 'small' ? 'mistral-small-latest' : 'codestral-latest',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages,
-          ],
-          stream: true,
-          temperature: 0.7,
-          max_tokens: 2048,
-        }),
+        body: formData,
       });
+
       if (!response.ok) {
         const errorText = await response.text();
         yield this.language === 'en'
@@ -278,6 +333,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : `मिस्ट्रल API त्रुटी: ${response.status} ${response.statusText}. ${errorText}`;
         return;
       }
+
       const reader = response.body?.getReader();
       if (!reader) {
         yield this.language === 'en'
@@ -285,6 +341,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
           : "त्रुटी: प्रतिसाद प्रवाह वाचण्यात अक्षम";
         return;
       }
+
       const decoder = new TextDecoder();
       let fullResponse = '';
       try {
@@ -314,6 +371,7 @@ If the user asks for a quiz, create a quiz question or practice problem based on
       } finally {
         reader.releaseLock();
       }
+
       if (!fullResponse.trim()) {
         yield this.language === 'en'
           ? "No response received from Mistral. Please try again."
@@ -327,9 +385,9 @@ If the user asks for a quiz, create a quiz question or practice problem based on
     }
   }
 
-  async generateResponse(messages: Array<{ role: string; content: string }>): Promise<string> {
+  async generateResponse(messages: Array<{ role: string; content: string }>, files?: File[]): Promise<string> {
     let fullResponse = '';
-    for await (const chunk of this.generateStreamingResponse(messages, this.language)) {
+    for await (const chunk of this.generateStreamingResponse(messages, this.language, files)) {
       fullResponse += chunk;
     }
     return fullResponse;
