@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { X, Settings, Key, Download, Upload, Languages, Shield, Database } from 'lucide-react';
+import { X, Settings, Key, Download, Upload, Languages, Shield, Database, Eye, EyeOff, HelpCircle } from 'lucide-react';
 import { APISettings } from '../types';
 import { storageUtils } from '../utils/storage';
 import { LanguageContext } from '../contexts/LanguageContext';
@@ -12,9 +12,16 @@ interface SettingsModalProps {
   isSidebarFolded: boolean;
 }
 
+const apiInfo = {
+  google: { name: 'Google AI', url: 'https://aistudio.google.com/app/apikey' },
+  zhipu: { name: 'ZhipuAI', url: 'https://open.bigmodel.cn/' },
+  mistral: { name: 'Mistral', url: 'https://console.mistral.ai/api-keys' },
+};
+
 export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSidebarFolded }: SettingsModalProps) {
   const { selectedLanguage, setSelectedLanguage } = useContext(LanguageContext);
   const [localSettings, setLocalSettings] = useState<APISettings>(settings);
+  const [visibleApis, setVisibleApis] = useState<Record<string, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -24,6 +31,10 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSid
   const handleLanguageChange = (language: 'en' | 'mr') => {
     setSelectedLanguage(language);
     localStorage.setItem('ai-tutor-language', language);
+  };
+
+  const toggleApiVisibility = (id: string) => {
+    setVisibleApis(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   const handleSave = () => {
@@ -88,7 +99,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSid
         }`}
       />
       <div
-        className={`fixed top-0 bottom-0 z-40 w-full max-w-md bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 bottom-0 z-40 w-full max-w-sm bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-2xl transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ left: sidebarWidth }}
@@ -131,22 +142,34 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSid
               <h3 className="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
                 <Shield /> {selectedLanguage === 'en' ? 'API Keys' : 'API की'}
               </h3>
-              {[{id: 'google', name: 'Google AI'}, {id: 'zhipu', name: 'ZhipuAI'}, {id: 'mistral', name: 'Mistral'}].map(api => (
-                <div key={api.id}>
-                  <label htmlFor={`${api.id}ApiKey`} className="text-sm font-medium text-[var(--color-text-secondary)] mb-2 block">{api.name} API Key</label>
-                  <div className="relative">
-                    <Key className="w-4 h-4 text-[var(--color-text-secondary)] absolute top-1/2 left-3 -translate-y-1/2" />
-                    <input
-                      id={`${api.id}ApiKey`}
-                      type="password"
-                      value={localSettings[`${api.id}ApiKey` as keyof APISettings]}
-                      onChange={(e) => setLocalSettings(prev => ({ ...prev, [`${api.id}ApiKey`]: e.target.value }))}
-                      placeholder={`${api.name} key`}
-                      className="w-full pl-9 pr-4 py-2 border border-[var(--color-border)] rounded-lg bg-[var(--color-card)] focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
-                    />
+              {Object.keys(apiInfo).map(key => {
+                const id = key as keyof typeof apiInfo;
+                const apiKeyId = `${id}ApiKey` as keyof APISettings;
+                return (
+                  <div key={id}>
+                    <label htmlFor={apiKeyId} className="text-sm font-medium text-[var(--color-text-secondary)] mb-2 flex items-center gap-1.5">
+                      {apiInfo[id].name} API Key
+                      <a href={apiInfo[id].url} target="_blank" rel="noopener noreferrer" title={`Get ${apiInfo[id].name} key`}>
+                        <HelpCircle className="w-3.5 h-3.5 text-[var(--color-text-placeholder)] hover:text-[var(--color-text-primary)]" />
+                      </a>
+                    </label>
+                    <div className="relative">
+                      <Key className="w-4 h-4 text-[var(--color-text-secondary)] absolute top-1/2 left-3 -translate-y-1/2" />
+                      <input
+                        id={apiKeyId}
+                        type={visibleApis[id] ? 'text' : 'password'}
+                        value={localSettings[apiKeyId]}
+                        onChange={(e) => setLocalSettings(prev => ({ ...prev, [apiKeyId]: e.target.value }))}
+                        placeholder={`${apiInfo[id].name} key`}
+                        className="w-full pl-9 pr-10 py-2 border border-[var(--color-border)] rounded-lg bg-[var(--color-card)] focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors"
+                      />
+                      <button type="button" onClick={() => toggleApiVisibility(id)} className="absolute top-1/2 right-3 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
+                        {visibleApis[id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
             
             <div className="space-y-4">
