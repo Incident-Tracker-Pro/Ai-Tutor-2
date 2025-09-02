@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -28,6 +28,7 @@ function App() {
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [sidebarFolded, setSidebarFolded] = useState(false);
+  const stopStreamingRef = useRef(false);
 
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
 
@@ -166,6 +167,7 @@ function App() {
     }));
 
     setIsLoading(true);
+    stopStreamingRef.current = false;
     try {
       const assistantMessage: Message = {
         id: generateId(),
@@ -187,6 +189,9 @@ function App() {
 
       let fullResponse = '';
       for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
+        if (stopStreamingRef.current) {
+          break;
+        }
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
@@ -212,6 +217,7 @@ function App() {
       setStreamingMessage(null);
     } finally {
       setIsLoading(false);
+      stopStreamingRef.current = false;
     }
   };
 
@@ -236,8 +242,6 @@ function App() {
     const messageIndex = currentConversation.messages.findIndex(m => m.id === messageId);
     if (messageIndex <= 0) return;
 
-    const userMessage = currentConversation.messages[messageIndex - 1];
-
     const updatedMessages = currentConversation.messages.slice(0, messageIndex);
 
     setConversations(prev => prev.map(conv => {
@@ -252,6 +256,7 @@ function App() {
     }));
 
     setIsLoading(true);
+    stopStreamingRef.current = false;
     try {
       const assistantMessage: Message = {
         id: generateId(),
@@ -269,6 +274,9 @@ function App() {
 
       let fullResponse = '';
       for await (const chunk of aiService.generateStreamingResponse(messages, selectedLanguage)) {
+        if (stopStreamingRef.current) {
+          break;
+        }
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
@@ -294,7 +302,12 @@ function App() {
       setStreamingMessage(null);
     } finally {
       setIsLoading(false);
+      stopStreamingRef.current = false;
     }
+  };
+
+  const handleStopGenerating = () => {
+    stopStreamingRef.current = true;
   };
 
   return (
@@ -305,6 +318,7 @@ function App() {
         settings={settings}
         onSaveSettings={handleSaveSettings}
         isSidebarFolded={sidebarFolded}
+        isSidebarOpen={sidebarOpen}
       />
       
       {sidebarOpen && (
@@ -342,6 +356,7 @@ function App() {
         model={settings.selectedModel}
         onEditMessage={handleEditMessage}
         onRegenerateResponse={handleRegenerateResponse}
+        onStopGenerating={handleStopGenerating}
       />
 
       {isInstallable && !isInstalled && (
