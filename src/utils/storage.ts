@@ -6,6 +6,7 @@ const SETTINGS_KEY = 'ai-tutor-settings';
 const defaultSettings: APISettings = {
   googleApiKey: '',
   zhipuApiKey: '',
+  mistralApiKey: '',
   selectedModel: 'google',
 };
 
@@ -14,7 +15,7 @@ export const storageUtils = {
     try {
       const stored = localStorage.getItem(CONVERSATIONS_KEY);
       if (!stored) return [];
-      
+
       const parsed = JSON.parse(stored);
       return parsed.map((conv: any) => ({
         ...conv,
@@ -43,7 +44,7 @@ export const storageUtils = {
     try {
       const stored = localStorage.getItem(SETTINGS_KEY);
       if (!stored) return defaultSettings;
-      
+
       return { ...defaultSettings, ...JSON.parse(stored) };
     } catch (error) {
       console.error('Error loading settings:', error);
