@@ -10,6 +10,7 @@ interface SettingsModalProps {
   settings: APISettings;
   onSaveSettings: (settings: APISettings) => void;
   isSidebarFolded: boolean;
+  isSidebarOpen: boolean;
 }
 
 const apiInfo = {
@@ -18,7 +19,7 @@ const apiInfo = {
   mistral: { name: 'Mistral', url: 'https://console.mistral.ai/api-keys' },
 };
 
-export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSidebarFolded }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSidebarFolded, isSidebarOpen }: SettingsModalProps) {
   const { selectedLanguage, setSelectedLanguage } = useContext(LanguageContext);
   const [localSettings, setLocalSettings] = useState<APISettings>(settings);
   const [visibleApis, setVisibleApis] = useState<Record<string, boolean>>({});
@@ -88,7 +89,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSid
     fileInputRef.current?.click();
   };
 
-  const sidebarWidth = isSidebarFolded ? '4rem' : '16rem';
+  const sidebarWidth = isSidebarOpen ? (isSidebarFolded ? '4rem' : '16rem') : '0rem';
 
   return (
     <>
