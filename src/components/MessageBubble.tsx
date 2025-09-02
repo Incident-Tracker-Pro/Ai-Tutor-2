@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Smile, Sparkles, Copy, Check, Edit2, RefreshCcw, Save, X, FileText } from 'lucide-react';
+import { Smile, Sparkles, Copy, Check, Edit2, RefreshCcw, Save, X } from 'lucide-react';
 import { Message } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
 
@@ -16,10 +16,10 @@ interface MessageBubbleProps {
 }
 
 const modelNames = {
-  google: { en: 'Gemma Ma\'am', mr: 'जेम्मा मॅम' },
-  zhipu: { en: 'Zhipu Sir', mr: 'झिपू सर' },
-  'mistral-small': { en: 'Misty Miss', mr: 'मिस्टी मिस' },
-  'mistral-codestral': { en: 'Cody Guru', mr: 'कोडी गुरु' },
+  google: { en: "Gemma Ma'am", mr: "जेम्मा मॅम" },
+  zhipu: { en: "Zhipu Sir", mr: "झिपू सर" },
+  'mistral-small': { en: "Misty Miss", mr: "मिस्टी मिस" },
+  'mistral-codestral': { en: "Cody Guru", mr: "कोडी गुरु" },
 };
 
 export function MessageBubble({
@@ -27,7 +27,7 @@ export function MessageBubble({
   isStreaming = false,
   model,
   onEditMessage,
-  onRegenerateResponse,
+  onRegenerateResponse
 }: MessageBubbleProps) {
   const { selectedLanguage } = useContext(LanguageContext);
   const isUser = message.role === 'user';
@@ -38,9 +38,9 @@ export function MessageBubble({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const copyTimeoutRef = useRef<NodeJS.Timeout>();
-  const displayModel = isUser
-    ? undefined
-    : modelNames[message.model || model || 'google'][selectedLanguage];
+  const displayModel = isUser ? undefined : (
+    modelNames[message.model || model || 'google'][selectedLanguage]
+  );
 
   const handleCopy = useCallback(async () => {
     try {
@@ -85,16 +85,13 @@ export function MessageBubble({
     }
   }, [isEditing, editContent]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && e.ctrlKey) {
-        handleSaveEdit();
-      } else if (e.key === 'Escape') {
-        handleCancelEdit();
-      }
-    },
-    [handleSaveEdit, handleCancelEdit]
-  );
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  }, [handleSaveEdit, handleCancelEdit]);
 
   useEffect(() => {
     return () => {
@@ -195,7 +192,11 @@ export function MessageBubble({
                           className="absolute right-2 top-2 p-1 bg-gray-700 rounded hover:bg-gray-600 text-white text-xs z-10"
                           title={selectedLanguage === 'en' ? 'Copy code' : 'कोड कॉपी करा'}
                         >
-                          {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                          {copied ? (
+                            <Check className="w-3 h-3" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
                         </button>
                         <SyntaxHighlighter
                           style={oneDark}
@@ -244,12 +245,6 @@ export function MessageBubble({
             )}
           </div>
         )}
-        {message.files?.map((file, index) => (
-          <div key={index} className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center gap-2">
-            <FileText className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-            <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[200px]">{file}</span>
-          </div>
-        ))}
         {!isEditing && !isStreaming && message.content.length > 0 && (
           <div className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
             {!isUser && onRegenerateResponse && (
