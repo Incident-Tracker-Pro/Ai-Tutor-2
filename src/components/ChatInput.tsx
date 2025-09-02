@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Paperclip } from 'lucide-react';
 import { LanguageContext } from '../contexts/LanguageContext';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
+  isDocumentChat?: boolean;
+  onFileUpload?: (file: File) => void;
 }
 
-export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatInputProps) {
+export function ChatInput({ onSendMessage, isLoading, disabled = false, isDocumentChat = false, onFileUpload }: ChatInputProps) {
   const { selectedLanguage } = useContext(LanguageContext);
   const [input, setInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -38,7 +40,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
-
       resizeTimeoutRef.current = setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.style.height = 'auto';
@@ -48,6 +49,12 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
       }, 50);
     }
   }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0] && onFileUpload) {
+      onFileUpload(e.target.files[0]);
+    }
+  };
 
   useEffect(() => {
     resizeTextarea();
@@ -75,6 +82,17 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
     }`}>
       <form onSubmit={handleSubmit} className="relative">
         <div className="flex items-end gap-3">
+          {isDocumentChat && (
+            <label className="cursor-pointer flex-shrink-0 mb-1">
+              <Paperclip className="w-5 h-5 text-gray-500 hover:text-gray-700 transition-colors" />
+              <input
+                type="file"
+                accept=".pdf,.txt,.md"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+          )}
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -83,10 +101,11 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               onKeyDown={handleKeyDown}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={disabled ? 
-                (selectedLanguage === 'en' ? 'Please configure API keys in Settings first...' : 'कृपया प्रथम सेटिंग्जमध्ये API की कॉन्फिगर करा...') : 
-                (selectedLanguage === 'en' ? 'Send a message...' : 'संदेश पाठवा...')
-              }
+              placeholder={disabled ? (
+                selectedLanguage === 'en' ? 'Please configure API keys in Settings first...' : 'कृपया प्रथम सेटिंग्जमध्ये API की कॉन्फिगर करा...'
+              ) : (
+                selectedLanguage === 'en' ? 'Send a message...' : 'संदेश पाठवा...'
+              )}
               disabled={disabled || isLoading}
               className={`w-full min-h-[52px] max-h-[120px] p-3 pr-12 border rounded-lg resize-none transition-all duration-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 font-medium ${
                 disabled || isLoading
@@ -107,7 +126,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
               </div>
             )}
           </div>
-
           <div className="flex items-end pb-1">
             <button
               type="submit"
@@ -117,10 +135,11 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
                   ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed scale-95 opacity-60'
                   : 'bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
               } text-white`}
-              title={selectedLanguage === 'en' ? 
-                (!canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)') :
-                (!canSend ? (disabled ? 'प्रथम API की कॉन्फिगर करा' : 'संदेश प्रविष्ट करा') : 'संदेश पाठवा (Enter)')
-              }
+              title={selectedLanguage === 'en' ? (
+                !canSend ? (disabled ? 'Configure API keys first' : 'Enter a message') : 'Send message (Enter)'
+              ) : (
+                !canSend ? (disabled ? 'प्रथम API की कॉन्फिगर करा' : 'संदेश प्रविष्ट करा') : 'संदेश पाठवा (Enter)'
+              )}
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -131,7 +150,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           </div>
         </div>
       </form>
-
       <div className={`transition-all duration-200 overflow-hidden ${
         disabled || input.length > 1500 ? 'max-h-10 mt-2 opacity-100' : 'max-h-0 opacity-0'
       }`}>
@@ -152,7 +170,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           </p>
         )}
       </div>
-
       {isFocused && !disabled && (
         <div className="mt-2 flex justify-center">
           <p className="text-xs text-gray-400 dark:text-gray-500 transition-opacity duration-200">
