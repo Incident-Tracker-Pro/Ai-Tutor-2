@@ -32,7 +32,6 @@ function App() {
 
   const { isInstallable, isInstalled, installApp, dismissInstallPrompt } = usePWA();
   
-  // CRITICAL FIX: This effect listens for window resize to set sidebar visibility correctly.
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) {
@@ -42,7 +41,6 @@ function App() {
       }
     };
     window.addEventListener('resize', handleResize);
-    // Call handler right away so state is correct on initial render
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -79,7 +77,7 @@ function App() {
     aiService.updateSettings(newSettings, selectedLanguage);
   };
 
-  const handleToggleSidebarFold = () => {
+  const handleToggleFold = () => {
     setSidebarFolded(!sidebarFolded);
   };
 
