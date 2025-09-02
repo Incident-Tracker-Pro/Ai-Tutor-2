@@ -10,8 +10,8 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
   onOpenSettings: () => void;
-  settings: { selectedModel: 'google' | 'zhipu' };
-  onModelChange: (model: 'google' | 'zhipu') => void;
+  settings: { selectedModel: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' };
+  onModelChange: (model: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral') => void;
   onCloseSidebar: () => void;
   isFolded?: boolean;
   onToggleFold?: () => void;
@@ -31,7 +31,6 @@ export function Sidebar({
   onToggleFold,
 }: SidebarProps) {
   const { selectedLanguage } = useContext(LanguageContext);
-
   return (
     <div
       className={`${
@@ -41,9 +40,9 @@ export function Sidebar({
       <div className="p-4 border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <img 
-              src="/robot.png" 
-              alt="AI Tutor" 
+            <img
+              src="/robot.png"
+              alt="AI Tutor"
               className="w-6 h-6 object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -86,7 +85,7 @@ export function Sidebar({
             </button>
           </div>
         </div>
-        
+
         {!isFolded && (
           <>
             <button
@@ -104,21 +103,22 @@ export function Sidebar({
                 {selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
               </span>
             </button>
-            
+
             <div className="space-y-2">
               <p className={`text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider px-1 ${
                 selectedLanguage === 'mr' ? 'font-semibold' : ''
               }`}>
                 {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-4 gap-1">
                 <button
                   onClick={() => onModelChange('google')}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
                     settings.selectedModel === 'google'
-                      ? 'bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-500 text-blue-700 dark:text-blue-300'
-                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border-2 border-transparent text-gray-600 dark:text-gray-300'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 border border-blue-500 text-blue-700 dark:text-blue-300'
+                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
+                  title="Google Gemini"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
@@ -127,22 +127,51 @@ export function Sidebar({
                 </button>
                 <button
                   onClick={() => onModelChange('zhipu')}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
                     settings.selectedModel === 'zhipu'
-                      ? 'bg-purple-100 dark:bg-purple-900/30 border-2 border-purple-500 text-purple-700 dark:text-purple-300'
-                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border-2 border-transparent text-gray-600 dark:text-gray-300'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 border border-purple-500 text-purple-700 dark:text-purple-300'
+                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
+                  title="ZhipuAI"
                 >
                   <Bot className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     ZhipuAI
                   </span>
                 </button>
+                <button
+                  onClick={() => onModelChange('mistral-small')}
+                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                    settings.selectedModel === 'mistral-small'
+                      ? 'bg-green-100 dark:bg-green-900/30 border border-green-500 text-green-700 dark:text-green-300'
+                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
+                  }`}
+                  title="Mistral Small"
+                >
+                  <Bot className="w-4 h-4" />
+                  <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
+                    Mistral
+                  </span>
+                </button>
+                <button
+                  onClick={() => onModelChange('mistral-codestral')}
+                  className={`flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                    settings.selectedModel === 'mistral-codestral'
+                      ? 'bg-orange-100 dark:bg-orange-900/30 border border-orange-500 text-orange-700 dark:text-orange-300'
+                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
+                  }`}
+                  title="Codestral"
+                >
+                  <Bot className="w-4 h-4" />
+                  <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
+                    Codestral
+                  </span>
+                </button>
               </div>
             </div>
           </>
         )}
-        
+
         {isFolded && (
           <div className="space-y-3">
             <button
@@ -162,7 +191,7 @@ export function Sidebar({
           </div>
         )}
       </div>
-      
+
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
           {conversations.length === 0 ? (
