@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useContext } from 'rea
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Smile, Sparkles, Copy, Check, Edit2, RefreshCcw, Save, X } from 'lucide-react';
 import { Message } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
@@ -16,10 +16,10 @@ interface MessageBubbleProps {
 }
 
 const modelNames = {
-  google: { en: "Gemma Ma'am", mr: "जेम्मा मॅम" },
-  zhipu: { en: "Zhipu Sir", mr: "झिपू सर" },
-  'mistral-small': { en: "Misty Miss", mr: "मिस्टी मिस" },
-  'mistral-codestral': { en: "Cody Guru", mr: "कोडी गुरु" },
+  google: { en: "Gemma", mr: "जेम्मा" },
+  zhipu: { en: "Zhipu", mr: "झिपू" },
+  'mistral-small': { en: "Misty", mr: "मिस्टी" },
+  'mistral-codestral': { en: "Cody", mr: "कोडी" },
 };
 
 export function MessageBubble({
@@ -101,39 +101,23 @@ export function MessageBubble({
     };
   }, []);
 
-  useEffect(() => {
-    if (bubbleRef.current) {
-      bubbleRef.current.style.transform = 'translateY(20px)';
-      bubbleRef.current.style.opacity = '0';
-      const timeout = setTimeout(() => {
-        if (bubbleRef.current) {
-          bubbleRef.current.style.transform = 'translateY(0)';
-          bubbleRef.current.style.opacity = '1';
-        }
-      }, 50);
-      return () => clearTimeout(timeout);
-    }
-  }, []);
-
   return (
     <div
       ref={bubbleRef}
-      className={`flex gap-3 mb-2 ${isUser ? 'justify-end' : 'justify-start'} group transition-all duration-300 ease-out`}
+      className={`flex gap-4 mb-6 ${isUser ? 'justify-end' : 'justify-start'} group transition-all duration-300 ease-out`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {!isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-          <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-card)]">
+          <Sparkles className="w-4 h-4 text-[var(--color-text-secondary)]" />
         </div>
       )}
       <div
-        className={`relative max-w-[80%] p-4 rounded-xl bg-gray-200 dark:bg-gray-300 ${
-          isUser ? 'text-black font-semibold' : 'text-black font-medium'
-        }`}
+        className={`relative max-w-[85%] ${ isUser ? 'bg-[var(--color-card)] p-4 rounded-xl' : '' }`}
       >
         {!isUser && displayModel && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
+          <div className="text-sm text-[var(--color-text-primary)] mb-2 font-semibold">
             {displayModel}
           </div>
         )}
@@ -144,13 +128,13 @@ export function MessageBubble({
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full min-h-[100px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black font-medium"
+              className="w-full min-h-[100px] p-3 border border-[var(--color-border)] rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[var(--color-card)] text-[var(--color-text-primary)] font-medium"
               placeholder={selectedLanguage === 'en' ? 'Edit your message...' : 'आपला संदेश संपादित करा...'}
             />
             <div className="flex gap-2 justify-end">
               <button
                 onClick={handleCancelEdit}
-                className="flex items-center gap-1 px-3 py-1.5 text-gray-600 hover:text-gray-800 transition-colors text-sm"
+                className="flex items-center gap-1 px-3 py-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors text-sm"
               >
                 <X className="w-3 h-3" />
                 {selectedLanguage === 'en' ? 'Cancel' : 'रद्द करा'}
@@ -164,14 +148,14 @@ export function MessageBubble({
                 {selectedLanguage === 'en' ? 'Save' : 'जतन करा'}
               </button>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-[var(--color-text-placeholder)]">
               {selectedLanguage === 'en'
                 ? 'Press Ctrl+Enter to save, Escape to cancel'
                 : 'जतन करण्यासाठी Ctrl+Enter दाबा, रद्द करण्यासाठी Escape दाबा'}
             </p>
           </div>
         ) : (
-          <div className={`prose prose-base max-w-none leading-relaxed ${isUser ? 'font-semibold' : ''}`}>
+          <div className={`prose prose-invert prose-base max-w-none leading-relaxed font-medium`}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -186,23 +170,26 @@ export function MessageBubble({
                       setTimeout(() => setCopied(false), 2000);
                     };
                     return (
-                      <div className="relative my-2">
-                        <button
-                          onClick={handleCopy}
-                          className="absolute right-2 top-2 p-1 bg-gray-700 rounded hover:bg-gray-600 text-white text-xs z-10"
-                          title={selectedLanguage === 'en' ? 'Copy code' : 'कोड कॉपी करा'}
-                        >
-                          {copied ? (
-                            <Check className="w-3 h-3" />
-                          ) : (
-                            <Copy className="w-3 h-3" />
-                          )}
-                        </button>
+                      <div className="relative my-2 text-sm">
+                        <div className="absolute right-2 top-2 flex items-center gap-2">
+                           <span className="text-xs text-gray-400">{match[1]}</span>
+                           <button
+                              onClick={handleCopy}
+                              className="p-1.5 bg-gray-800 rounded hover:bg-gray-700 text-gray-300"
+                              title={selectedLanguage === 'en' ? 'Copy code' : 'कोड कॉपी करा'}
+                           >
+                              {copied ? (
+                                <Check className="w-3 h-3" />
+                              ) : (
+                                <Copy className="w-3 h-3" />
+                              )}
+                           </button>
+                        </div>
                         <SyntaxHighlighter
-                          style={oneDark}
+                          style={vscDarkPlus}
                           language={match[1]}
                           PreTag="div"
-                          className="rounded-md"
+                          className="!bg-[#121212] rounded-md !p-4"
                           {...props}
                         >
                           {codeContent}
@@ -211,7 +198,7 @@ export function MessageBubble({
                     );
                   } else {
                     return (
-                      <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
+                      <code className="bg-[var(--color-card)] px-1.5 py-0.5 rounded text-sm" {...props}>
                         {children}
                       </code>
                     );
@@ -220,7 +207,7 @@ export function MessageBubble({
                 table({ children }) {
                   return (
                     <div className="overflow-x-auto my-4">
-                      <table className="border-collapse border border-gray-300 dark:border-gray-600 w-full">
+                      <table className="border-collapse border border-[var(--color-border)] w-full">
                         {children}
                       </table>
                     </div>
@@ -228,58 +215,58 @@ export function MessageBubble({
                 },
                 th({ children }) {
                   return (
-                    <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium">
+                    <th className="border border-[var(--color-border)] p-2 bg-[var(--color-card)] font-semibold">
                       {children}
                     </th>
                   );
                 },
                 td({ children }) {
-                  return <td className="border border-gray-300 dark:border-gray-600 p-2">{children}</td>;
+                  return <td className="border border-[var(--color-border)] p-2">{children}</td>;
                 },
               }}
             >
               {message.content}
             </ReactMarkdown>
             {isStreaming && (
-              <span className="inline-block w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-pulse ml-1"></span>
+              <span className="inline-block w-2 h-2 bg-[var(--color-text-placeholder)] rounded-full animate-pulse ml-1"></span>
             )}
           </div>
         )}
         {!isEditing && !isStreaming && message.content.length > 0 && (
-          <div className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
-            {!isUser && onRegenerateResponse && (
-              <button
-                onClick={handleRegenerate}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-                title={selectedLanguage === 'en' ? 'Regenerate response' : 'प्रतिसाद पुन्हा तयार करा'}
-              >
-                <RefreshCcw className="w-4 h-4" />
-              </button>
-            )}
-            {onEditMessage && (
-              <button
-                onClick={handleEdit}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-                title={selectedLanguage === 'en' ? 'Edit message' : 'संदेश संपादित करा'}
-              >
-                <Edit2 className="w-4 h-4" />
-              </button>
-            )}
-            {!isUser && (
-              <button
-                onClick={handleCopy}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-                title={selectedLanguage === 'en' ? 'Copy message' : 'संदेश कॉपी करा'}
-              >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </button>
-            )}
+          <div className={`absolute -bottom-1 -right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
+             <div className="flex gap-1 p-1 bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg">
+               {!isUser && onRegenerateResponse && (
+                 <button
+                   onClick={handleRegenerate}
+                   className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors p-1 rounded"
+                   title={selectedLanguage === 'en' ? 'Regenerate response' : 'प्रतिसाद पुन्हा तयार करा'}
+                 >
+                   <RefreshCcw className="w-4 h-4" />
+                 </button>
+               )}
+               {onEditMessage && (
+                 <button
+                   onClick={handleEdit}
+                   className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors p-1 rounded"
+                   title={selectedLanguage === 'en' ? 'Edit message' : 'संदेश संपादित करा'}
+                 >
+                   <Edit2 className="w-4 h-4" />
+                 </button>
+               )}
+               <button
+                 onClick={handleCopy}
+                 className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors p-1 rounded"
+                 title={selectedLanguage === 'en' ? 'Copy message' : 'संदेश कॉपी करा'}
+               >
+                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+               </button>
+             </div>
           </div>
         )}
       </div>
       {isUser && (
-        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
-          <Smile className="w-5 h-5 text-white" />
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-indigo-600">
+          <Smile className="w-4 h-4 text-white" />
         </div>
       )}
     </div>
