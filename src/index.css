@@ -7,6 +7,11 @@
 @tailwind utilities;
 
 @layer base {
+  ::selection {
+    background-color: #3B82F6; /* A nice blue accent for selection */
+    color: #FFFFFF;
+  }
+  
   :root {
     --color-bg: #0A0A0A;
     --color-sidebar: #141414;
