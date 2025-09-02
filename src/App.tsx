@@ -234,7 +234,7 @@ function App() {
         isSidebarFolded={sidebarFolded}
       />
       
-      <div className={`transition-all duration-300 ease-in-out ${sidebarOpen ? 'block' : 'hidden'} lg:block`}>
+      {sidebarOpen && (
         <Sidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -248,16 +248,18 @@ function App() {
           isFolded={sidebarFolded}
           onToggleFold={handleToggleFold}
         />
-      </div>
+      )}
 
       <div className="flex-1 flex flex-col relative">
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="absolute top-4 left-4 p-2 bg-[var(--color-card)] rounded-lg z-10 shadow-md hover:bg-[var(--color-border)] transition-colors lg:hidden"
-          title={selectedLanguage === 'en' ? 'Open sidebar' : 'साइडबार उघडा'}
-        >
-          <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
-        </button>
+        {!sidebarOpen && (
+            <button
+            onClick={() => setSidebarOpen(true)}
+            className="absolute top-4 left-4 p-2 bg-[var(--color-card)] rounded-lg z-10 shadow-md hover:bg-[var(--color-border)] transition-colors lg:hidden"
+            title={selectedLanguage === 'en' ? 'Open sidebar' : 'साइडबार उघडा'}
+            >
+            <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
+            </button>
+        )}
 
         <ChatArea
           messages={currentConversation?.messages || []}
@@ -271,7 +273,6 @@ function App() {
           onStopGenerating={handleStopGenerating}
         />
       </div>
-
 
       {isInstallable && !isInstalled && (
         <InstallPrompt
