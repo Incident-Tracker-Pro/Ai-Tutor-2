@@ -9,9 +9,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Globe,
-  Wind,
-  Code,
+  Brain,
+  Cloud,
+  Terminal,
 } from 'lucide-react';
 import { Conversation } from '../types';
 import { LanguageContext } from '../contexts/LanguageContext';
@@ -142,7 +142,7 @@ export function Sidebar({
                 {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {/* Google Gemini */}
+                {/* Gemma (Google Gemini) */}
                 <button
                   onClick={() => onModelChange('google')}
                   className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
@@ -150,11 +150,11 @@ export function Sidebar({
                       ? 'bg-blue-100 dark:bg-blue-900/30 border border-blue-500 text-blue-700 dark:text-blue-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
-                  title="Google Gemini"
+                  title="Gemma"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                    Gemini
+                    Gemma
                   </span>
                 </button>
 
@@ -168,7 +168,7 @@ export function Sidebar({
                   }`}
                   title="ZhipuAI"
                 >
-                  <Globe className="w-4 h-4" />
+                  <Brain className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     ZhipuAI
                   </span>
@@ -184,7 +184,7 @@ export function Sidebar({
                   }`}
                   title="Mistral Small"
                 >
-                  <Wind className="w-4 h-4" />
+                  <Cloud className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     Mistral
                   </span>
@@ -200,7 +200,7 @@ export function Sidebar({
                   }`}
                   title="Codestral"
                 >
-                  <Code className="w-4 h-4" />
+                  <Terminal className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
                     Codestral
                   </span>
