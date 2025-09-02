@@ -99,13 +99,6 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
                 scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
               }}
             />
-            {input.length > 500 && (
-              <div className={`absolute bottom-2 right-16 text-xs transition-colors duration-200 ${
-                input.length > 1000 ? 'text-red-500' : 'text-gray-400'
-              }`}>
-                {input.length}/2000
-              </div>
-            )}
           </div>
 
           <div className="flex items-end pb-1">
