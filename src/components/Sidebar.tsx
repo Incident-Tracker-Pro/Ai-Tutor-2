@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Plus,
   MessageSquare,
@@ -8,6 +8,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Search,
   Sparkles,
   Brain,
   Cloud,
@@ -44,64 +45,119 @@ export function Sidebar({
   onToggleFold,
 }: SidebarProps) {
   const { selectedLanguage } = useContext(LanguageContext);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const modelConfig = {
-    google: {
-      icon: Sparkles,
-      name: 'Gemma',
-      color: 'blue',
-      gradient: 'from-blue-500 to-indigo-600'
-    },
-    zhipu: {
-      icon: Brain,
-      name: 'ZhipuAI',
-      color: 'purple',
-      gradient: 'from-purple-500 to-violet-600'
-    },
-    'mistral-small': {
-      icon: Cloud,
-      name: 'Mistral',
-      color: 'emerald',
-      gradient: 'from-emerald-500 to-teal-600'
-    },
-    'mistral-codestral': {
-      icon: Terminal,
-      name: 'Codestral',
-      color: 'orange',
-      gradient: 'from-orange-500 to-amber-600'
+  const filteredConversations = conversations.filter(conv =>
+    conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Group conversations by time periods
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+  const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const groupedConversations = {
+    today: filteredConversations.filter(conv => new Date(conv.updatedAt) >= today),
+    yesterday: filteredConversations.filter(conv => {
+      const date = new Date(conv.updatedAt);
+      return date >= yesterday && date < today;
+    }),
+    lastWeek: filteredConversations.filter(conv => {
+      const date = new Date(conv.updatedAt);
+      return date >= lastWeek && date < yesterday;
+    }),
+    older: filteredConversations.filter(conv => new Date(conv.updatedAt) < lastWeek),
+  };
+
+  const getModelIcon = (model: string) => {
+    switch (model) {
+      case 'google': return <Sparkles className="w-3 h-3 text-blue-500" />;
+      case 'zhipu': return <Brain className="w-3 h-3 text-purple-500" />;
+      case 'mistral-small': return <Cloud className="w-3 h-3 text-green-500" />;
+      case 'mistral-codestral': return <Terminal className="w-3 h-3 text-orange-500" />;
+      default: return <MessageSquare className="w-3 h-3 text-gray-400" />;
     }
+  };
+
+  const renderConversationGroup = (title: string, conversations: Conversation[]) => {
+    if (conversations.length === 0) return null;
+
+    return (
+      <div key={title} className="mb-4">
+        {!isFolded && (
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-3">
+            {title}
+          </h3>
+        )}
+        <div className="space-y-1">
+          {conversations.map((conversation) => (
+            <div
+              key={conversation.id}
+              className={`group relative flex items-center gap-3 ${
+                isFolded ? 'justify-center p-2 mx-1' : 'px-3 py-2 mx-2'
+              } rounded-lg cursor-pointer transition-all duration-200 ${
+                currentConversationId === conversation.id
+                  ? 'bg-gray-800 border-l-2 border-blue-500'
+                  : 'hover:bg-gray-800/50'
+              }`}
+              onClick={() => onSelectConversation(conversation.id)}
+              title={isFolded ? conversation.title : undefined}
+            >
+              {/* Model Icon */}
+              <div className="flex-shrink-0">
+                {getModelIcon(conversation.messages[conversation.messages.length - 1]?.model || 'google')}
+              </div>
+              
+              {!isFolded && (
+                <>
+                  <span className="flex-1 text-sm text-white truncate font-medium">
+                    {conversation.title}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteConversation(conversation.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 hover:text-red-400 rounded transition-all duration-200"
+                    title={selectedLanguage === 'en' ? 'Delete conversation' : 'संभाषण हटवा'}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
     <div
       className={`${
-        isFolded ? 'w-16' : 'w-72'
-      } bg-white dark:bg-gray-900 flex flex-col h-full border-r border-gray-200 dark:border-gray-800 sidebar transition-all duration-300 ease-in-out fixed md:static z-50 shadow-lg md:shadow-none`}
+        isFolded ? 'w-12' : 'w-80'
+      } bg-black flex flex-col h-full sidebar transition-all duration-300 ease-in-out fixed md:static z-50 border-r border-gray-800`}
     >
       {/* Header */}
-      <div className="p-5 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <img
-                src="/robot.png"
-                alt="AI Tutor"
-                className="w-5 h-5 object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.nextElementSibling?.classList.remove('hidden');
-                }}
-              />
-              <Bot className="w-5 h-5 text-white hidden" />
-            </div>
+      <div className="p-4 border-b border-gray-800">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <img
+              src="/robot.png"
+              alt="AI Tutor"
+              className="w-6 h-6 object-contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <Bot className="w-6 h-6 text-gray-400 hidden" />
             {!isFolded && (
-              <h1
-                className={`text-xl font-bold text-gray-900 dark:text-white ${
-                  selectedLanguage === 'mr' ? 'font-black' : ''
-                }`}
-              >
-                {selectedLanguage === 'en' ? 'AI Tutor' : 'एआय शिक्षक'}
+              <h1 className="text-lg font-bold text-white">
+                {selectedLanguage === 'en' ? 'Home Workspace' : 'होम वर्कस्पेस'}
               </h1>
             )}
           </div>
@@ -110,32 +166,30 @@ export function Sidebar({
             {!isFolded && (
               <button
                 onClick={onOpenSettings}
-                className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 hover:shadow-sm"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
                 title={selectedLanguage === 'en' ? 'Settings' : 'सेटिंग्ज'}
               >
                 <Settings className="w-4 h-4" />
               </button>
             )}
+            
             {onToggleFold && (
               <button
                 onClick={onToggleFold}
-                className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 hover:shadow-sm hidden md:block"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors hidden md:block"
                 title={
                   selectedLanguage === 'en'
-                    ? isFolded
-                      ? 'Expand sidebar'
-                      : 'Collapse sidebar'
-                    : isFolded
-                    ? 'साइडबार विस्तृत करा'
-                    : 'साइडबार संकुचित करा'
+                    ? isFolded ? 'Expand sidebar' : 'Collapse sidebar'
+                    : isFolded ? 'साइडबार विस्तृत करा' : 'साइडबार संकुचित करा'
                 }
               >
                 {isFolded ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
               </button>
             )}
+            
             <button
               onClick={onCloseSidebar}
-              className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 hover:shadow-sm md:hidden"
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors md:hidden"
               title={selectedLanguage === 'en' ? 'Close sidebar' : 'साइडबार बंद करा'}
             >
               <X className="w-4 h-4" />
@@ -143,146 +197,80 @@ export function Sidebar({
           </div>
         </div>
 
+        {/* New Chat Button */}
         {!isFolded ? (
-          <>
-            {/* New Chat Button */}
-            <button
-              onClick={onNewConversation}
-              className={`w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl transition-all duration-200 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] mb-6 ${
-                selectedLanguage === 'mr' ? 'font-bold text-shadow' : ''
-              }`}
-              style={
-                selectedLanguage === 'mr'
-                  ? { textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }
-                  : {}
-              }
-            >
-              <Plus className="w-5 h-5" />
-              <span className={selectedLanguage === 'mr' ? 'font-bold' : ''}>
-                {selectedLanguage === 'en' ? 'New Chat' : 'नवीन चॅट'}
-              </span>
-            </button>
-
-            {/* AI Model Selection */}
-            <div className="space-y-3">
-              <p
-                className={`text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1 ${
-                  selectedLanguage === 'mr' ? 'font-bold' : ''
-                }`}
-              >
-                {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(modelConfig).map(([key, config]) => {
-                  const IconComponent = config.icon;
-                  const isSelected = settings.selectedModel === key;
-                  
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => onModelChange(key as any)}
-                      className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 border ${
-                        isSelected
-                          ? `bg-gradient-to-br ${config.gradient} text-white shadow-lg border-transparent`
-                          : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:shadow-md'
-                      } hover:scale-105 active:scale-95`}
-                      title={config.name}
-                    >
-                      <IconComponent className="w-4 h-4" />
-                      <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                        {config.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </>
+          <button
+            onClick={onNewConversation}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-black rounded-lg transition-colors font-medium mb-4"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{selectedLanguage === 'en' ? 'New Chat' : 'नवीन चॅट'}</span>
+          </button>
         ) : (
-          /* Folded State */
-          <div className="space-y-3">
-            <button
-              onClick={onNewConversation}
-              className="w-full flex items-center justify-center p-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl transition-all duration-200 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
-              title={selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-            <button
-              onClick={onOpenSettings}
-              className="w-full flex items-center justify-center p-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-gray-600 dark:text-gray-300 shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
-              title={selectedLanguage === 'en' ? 'Settings' : 'सेटिंग्ज'}
-            >
-              <Settings className="w-5 h-5" />
-            </button>
+          <button
+            onClick={onNewConversation}
+            className="w-full flex items-center justify-center p-2 bg-white hover:bg-gray-100 text-black rounded-lg transition-colors mb-4"
+            title={selectedLanguage === 'en' ? 'New chat' : 'नवीन चॅट'}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Search Box */}
+        {!isFolded && (
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder={selectedLanguage === 'en' ? 'Search chats...' : 'चॅट शोधा...'}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-gray-600 transition-colors"
+            />
           </div>
+        )}
+
+        {/* Collapsed Settings */}
+        {isFolded && (
+          <button
+            onClick={onOpenSettings}
+            className="w-full flex items-center justify-center p-2 bg-gray-900 hover:bg-gray-800 text-gray-300 rounded-lg transition-colors"
+            title={selectedLanguage === 'en' ? 'Settings' : 'सेटिंग्ज'}
+          >
+            <Settings className="w-4 h-4" />
+          </button>
         )}
       </div>
 
-      {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto px-3 py-4">
+      {/* Chat History */}
+      <div className="flex-1 overflow-y-auto">
         {conversations.length === 0 ? (
-          <div className="text-center text-gray-400 dark:text-gray-500 mt-12 px-4">
-            <MessageSquare
-              className={`${isFolded ? 'w-6 h-6' : 'w-12 h-12'} mx-auto mb-3 opacity-50`}
-            />
+          <div className="text-center text-gray-400 mt-8 px-4">
+            <MessageSquare className={`${isFolded ? 'w-5 h-5' : 'w-8 h-8'} mx-auto mb-2`} />
             {!isFolded && (
-              <p className={`text-sm font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
+              <p className="text-sm">
                 {selectedLanguage === 'en' ? 'No conversations yet' : 'अद्याप कोणतेही संभाषण नाही'}
               </p>
             )}
           </div>
         ) : (
-          <div className="space-y-2">
-            {conversations.map((conversation, index) => (
-              <div
-                key={conversation.id}
-                className={`group flex items-center gap-3 ${
-                  isFolded ? 'justify-center p-3' : 'p-3'
-                } rounded-xl cursor-pointer transition-all duration-200 ${
-                  currentConversationId === conversation.id
-                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 shadow-sm'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm'
-                } hover:scale-[1.02] active:scale-[0.98]`}
-                onClick={() => onSelectConversation(conversation.id)}
-                title={isFolded ? conversation.title : undefined}
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                }}
-              >
-                <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                  currentConversationId === conversation.id
-                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
-                } transition-all duration-200`}>
-                  <MessageSquare className="w-4 h-4" />
-                </div>
-                
-                {!isFolded && (
-                  <>
-                    <span
-                      className={`flex-1 text-sm font-medium text-gray-700 dark:text-gray-200 truncate ${
-                        selectedLanguage === 'mr' ? 'font-semibold' : ''
-                      } ${
-                        currentConversationId === conversation.id ? 'text-blue-700 dark:text-blue-300' : ''
-                      }`}
-                    >
-                      {conversation.title}
-                    </span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteConversation(conversation.id);
-                      }}
-                      className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95"
-                      title={selectedLanguage === 'en' ? 'Delete conversation' : 'संभाषण हटवा'}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </>
-                )}
-              </div>
-            ))}
+          <div className="py-2">
+            {renderConversationGroup(
+              selectedLanguage === 'en' ? 'Today' : 'आज',
+              groupedConversations.today
+            )}
+            {renderConversationGroup(
+              selectedLanguage === 'en' ? 'Yesterday' : 'काल',
+              groupedConversations.yesterday
+            )}
+            {renderConversationGroup(
+              selectedLanguage === 'en' ? 'Previous 7 days' : 'मागील ७ दिवस',
+              groupedConversations.lastWeek
+            )}
+            {renderConversationGroup(
+              selectedLanguage === 'en' ? 'Older' : 'जुने',
+              groupedConversations.older
+            )}
           </div>
         )}
       </div>
