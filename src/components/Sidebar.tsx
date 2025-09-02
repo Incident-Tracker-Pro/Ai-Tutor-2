@@ -54,7 +54,7 @@ export function Sidebar({
     <div
       className={`${
         isFolded ? 'w-16' : 'w-64'
-      } bg-[var(--color-sidebar)] flex flex-col h-full border-r border-[var(--color-border)] sidebar transition-all duration-300 ease-in-out fixed md:static z-50`}
+      } bg-[var(--color-sidebar)] flex flex-col h-full border-r border-[var(--color-border)] sidebar transition-all duration-300 ease-in-out fixed lg:static z-20`}
     >
       <div className="p-2 border-b border-[var(--color-border)] flex flex-col gap-2">
         <div className={`flex items-center ${isFolded ? 'justify-center' : 'justify-between'}`}>
@@ -74,7 +74,7 @@ export function Sidebar({
             {onToggleFold && (
               <button
                 onClick={onToggleFold}
-                className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card)] rounded-lg transition-colors hidden md:block"
+                className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card)] rounded-lg transition-colors hidden lg:block"
                 title={isFolded ? 'Expand' : 'Collapse'}
               >
                 {isFolded ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -82,7 +82,7 @@ export function Sidebar({
             )}
             <button
               onClick={onCloseSidebar}
-              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card)] rounded-lg transition-colors md:hidden"
+              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card)] rounded-lg transition-colors lg:hidden"
               title={selectedLanguage === 'en' ? 'Close sidebar' : 'साइडबार बंद करा'}
             >
               <X className="w-4 h-4" />
