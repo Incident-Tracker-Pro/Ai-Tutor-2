@@ -9,9 +9,10 @@ interface SettingsModalProps {
   onClose: () => void;
   settings: APISettings;
   onSaveSettings: (settings: APISettings) => void;
+  isSidebarFolded: boolean;
 }
 
-export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSidebarFolded }: SettingsModalProps) {
   const { selectedLanguage, setSelectedLanguage } = useContext(LanguageContext);
   const [localSettings, setLocalSettings] = useState<APISettings>(settings);
   const [activeTab, setActiveTab] = useState<'general' | 'api' | 'data'>('general');
@@ -28,7 +29,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
 
   const handleSave = () => {
     onSaveSettings(localSettings);
-    onClose();
   };
 
   const handleExportData = () => {
@@ -80,7 +80,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
     fileInputRef.current?.click();
   };
 
-  if (!isOpen) return null;
+  const sidebarWidth = isSidebarFolded ? '4rem' : '16rem';
 
   const tabs = [
     { id: 'general' as const, icon: Palette, label: selectedLanguage === 'en' ? 'General' : 'सामान्य' },
@@ -89,232 +89,156 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[var(--color-sidebar)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden border border-[var(--color-border)]">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm">
+    <>
+      {/* Overlay */}
+      <div
+        onClick={onClose}
+        className={`fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+      {/* Settings Panel */}
+      <div
+        className={`fixed top-0 bottom-0 z-40 w-full max-w-md bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-2xl transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ left: sidebarWidth }}
+      >
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="p-6 border-b border-[var(--color-border)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <Settings className="w-5 h-5" />
-              </div>
-              <div>
                 <h2 className="text-xl font-bold">
                   {selectedLanguage === 'en' ? 'Settings' : 'सेटिंग्ज'}
                 </h2>
-                <p className="text-white/80 text-sm">
-                  {selectedLanguage === 'en' ? 'Customize your AI Tutor experience' : 'आपला एआय शिक्षक अनुभव सानुकूलित करा'}
-                </p>
               </div>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-card)] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-[var(--color-border)] bg-[var(--color-bg)]">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-4 font-medium transition-all duration-200 relative ${
-                activeTab === tab.id
-                  ? 'text-[var(--color-text-primary)] bg-[var(--color-sidebar)]'
-                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-sidebar)]'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              <span className={selectedLanguage === 'mr' ? 'font-semibold' : ''}>{tab.label}</span>
-              {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--color-text-primary)]" />
-              )}
-            </button>
-          ))}
-        </div>
+          {/* Tab Navigation */}
+          <div className="flex border-b border-[var(--color-border)] bg-[var(--color-bg)]">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-medium transition-all duration-200 relative ${
+                  activeTab === tab.id
+                    ? 'text-[var(--color-text-primary)] bg-[var(--color-sidebar)]'
+                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-sidebar)]'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span className={selectedLanguage === 'mr' ? 'font-semibold' : ''}>{tab.label}</span>
+                {activeTab === tab.id && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--color-text-primary)]" />
+                )}
+              </button>
+            ))}
+          </div>
 
-        {/* Tab Content */}
-        <div className="p-6 overflow-y-auto max-h-[60vh]">
-          {activeTab === 'general' && (
-            <div className="space-y-8">
-              {/* AI Model Selection */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-[var(--color-text-secondary)]" />
-                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-                    {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
-                  </h3>
+          {/* Tab Content */}
+          <div className="p-6 overflow-y-auto flex-1">
+            {activeTab === 'general' && (
+              <div className="space-y-8">
+                {/* AI Model Selection in Settings - this is a copy of what's in sidebar for consistency */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-[var(--color-text-secondary)]" />
+                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                      {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { id: 'google', name: 'Google Gemini', sub: 'Gemma-3-27b-it', icon: Sparkles, color: 'from-blue-500 to-purple-600' },
+                      { id: 'zhipu', name: 'ZhipuAI', sub: 'GLM-4.5-Flash', icon: Bot, color: 'from-purple-500 to-pink-600' },
+                      { id: 'mistral-small', name: 'Mistral Small', sub: 'mistral-small-latest', icon: Bot, color: 'from-green-500 to-emerald-600' },
+                      { id: 'mistral-codestral', name: 'Codestral', sub: 'codestral-latest', icon: Bot, color: 'from-orange-500 to-amber-600' },
+                    ].map(model => (
+                      <label key={model.id} className="group cursor-pointer">
+                        <div className={`p-4 border rounded-xl transition-colors h-full ${localSettings.selectedModel === model.id ? 'border-gray-500 bg-[var(--color-card)]' : 'border-[var(--color-border)] bg-transparent hover:bg-[var(--color-card)]'}`}>
+                          <div className="flex items-center gap-4">
+                            <input
+                              type="radio"
+                              name="model"
+                              value={model.id}
+                              checked={localSettings.selectedModel === model.id}
+                              onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as any }))}
+                              className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
+                            />
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className={`w-10 h-10 bg-gradient-to-br ${model.color} rounded-lg flex items-center justify-center`}>
+                                <model.icon className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <div className="font-semibold text-[var(--color-text-primary)]">{model.name}</div>
+                                <div className="text-sm text-[var(--color-text-secondary)]">{model.sub}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
-                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      localSettings.selectedModel === 'google'
-                        ? 'border-gray-500 bg-[var(--color-card)]'
-                        : 'border-[var(--color-border)] bg-transparent group-hover:bg-[var(--color-card)]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="model"
-                        value="google"
-                        checked={localSettings.selectedModel === 'google'}
-                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
-                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
-                      />
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                          <Sparkles className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[var(--color-text-primary)]">Google Gemini</div>
-                          <div className="text-sm text-[var(--color-text-secondary)]">Gemma-3-27b-it</div>
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
-                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      localSettings.selectedModel === 'zhipu'
-                        ? 'border-gray-500 bg-[var(--color-card)]'
-                        : 'border-[var(--color-border)] bg-transparent group-hover:bg-[var(--color-card)]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="model"
-                        value="zhipu"
-                        checked={localSettings.selectedModel === 'zhipu'}
-                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
-                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
-                      />
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                          <Bot className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[var(--color-text-primary)]">ZhipuAI</div>
-                          <div className="text-sm text-[var(--color-text-secondary)]">GLM-4.5-Flash</div>
+
+                {/* Language Selection */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Languages className="w-5 h-5 text-[var(--color-text-secondary)]" />
+                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                      {selectedLanguage === 'en' ? 'Language' : 'भाषा'}
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <label className="group cursor-pointer">
+                      <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${selectedLanguage === 'en' ? 'border-gray-500 bg-[var(--color-card)]' : 'border-[var(--color-border)] bg-transparent hover:bg-[var(--color-card)]'}`}>
+                        <input
+                          type="radio"
+                          name="language"
+                          value="en"
+                          checked={selectedLanguage === 'en'}
+                          onChange={() => handleLanguageChange('en')}
+                          className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
+                        />
+                         <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">EN</div>
+                          <span className="font-medium text-[var(--color-text-primary)]">English</span>
                         </div>
                       </div>
-                    </div>
-                  </label>
-                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
-                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      localSettings.selectedModel === 'mistral-small'
-                        ? 'border-gray-500 bg-[var(--color-card)]'
-                        : 'border-[var(--color-border)] bg-transparent group-hover:bg-[var(--color-card)]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="model"
-                        value="mistral-small"
-                        checked={localSettings.selectedModel === 'mistral-small'}
-                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
-                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
-                      />
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                          <Bot className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[var(--color-text-primary)]">Mistral Small</div>
-                          <div className="text-sm text-[var(--color-text-secondary)]">mistral-small-latest</div>
+                    </label>
+                     <label className="group cursor-pointer">
+                      <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${selectedLanguage === 'mr' ? 'border-gray-500 bg-[var(--color-card)]' : 'border-[var(--color-border)] bg-transparent hover:bg-[var(--color-card)]'}`}>
+                        <input
+                          type="radio"
+                          name="language"
+                          value="mr"
+                          checked={selectedLanguage === 'mr'}
+                          onChange={() => handleLanguageChange('mr')}
+                          className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
+                        />
+                         <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">मर</div>
+                          <span className={`font-medium text-[var(--color-text-primary)] ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>मराठी</span>
                         </div>
                       </div>
-                    </div>
-                  </label>
-                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
-                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      localSettings.selectedModel === 'mistral-codestral'
-                        ? 'border-gray-500 bg-[var(--color-card)]'
-                        : 'border-[var(--color-border)] bg-transparent group-hover:bg-[var(--color-card)]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="model"
-                        value="mistral-codestral"
-                        checked={localSettings.selectedModel === 'mistral-codestral'}
-                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
-                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
-                      />
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center">
-                          <Bot className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[var(--color-text-primary)]">Codestral</div>
-                          <div className="text-sm text-[var(--color-text-secondary)]">codestral-latest</div>
-                        </div>
-                      </div>
-                    </div>
-                  </label>
+                    </label>
+                  </div>
                 </div>
               </div>
-
-              {/* Language Selection */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Languages className="w-5 h-5 text-[var(--color-text-secondary)]" />
-                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-                    {selectedLanguage === 'en' ? 'Language' : 'भाषा'}
-                  </h3>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
-                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      selectedLanguage === 'en'
-                        ? 'border-gray-500 bg-[var(--color-card)]'
-                        : 'border-[var(--color-border)] bg-transparent group-hover:bg-[var(--color-card)]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="language"
-                        value="en"
-                        checked={selectedLanguage === 'en'}
-                        onChange={() => handleLanguageChange('en')}
-                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
-                      />
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                          EN
-                        </div>
-                        <span className="font-medium text-[var(--color-text-primary)]">English</span>
-                      </div>
-                    </div>
-                  </label>
-                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
-                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      selectedLanguage === 'mr'
-                        ? 'border-gray-500 bg-[var(--color-card)]'
-                        : 'border-[var(--color-border)] bg-transparent group-hover:bg-[var(--color-card)]'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="language"
-                        value="mr"
-                        checked={selectedLanguage === 'mr'}
-                        onChange={() => handleLanguageChange('mr')}
-                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-600 bg-gray-700"
-                      />
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                          मर
-                        </div>
-                        <span className={`font-medium text-[var(--color-text-primary)] ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                          मराठी
-                        </span>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'api' && (
-            <div className="space-y-8">
+            )}
+            
+            {/* API & Data Tabs remain visually the same, just inherit the new theme */}
+            {activeTab === 'api' && (
+              <div className="space-y-8">
               {/* Google API Key */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
@@ -444,10 +368,9 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                 </div>
               </div>
             </div>
-          )}
-
-          {activeTab === 'data' && (
-            <div className="space-y-8">
+            )}
+            {activeTab === 'data' && (
+               <div className="space-y-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Database className="w-5 h-5 text-[var(--color-text-secondary)]" />
@@ -507,30 +430,30 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                 />
               </div>
             </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-[var(--color-border)] bg-[var(--color-bg)]">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 text-[var(--color-text-primary)] hover:bg-[var(--color-card)] rounded-xl transition-colors font-medium"
-          >
-            {selectedLanguage === 'en' ? 'Cancel' : 'रद्द करा'}
-          </button>
-          <button
-            onClick={handleSave}
-            className={`px-6 py-3 bg-[var(--color-accent-bg)] text-[var(--color-accent-text)] rounded-xl transition-all duration-200 font-semibold ${
-              !localSettings.googleApiKey && !localSettings.zhipuApiKey && !localSettings.mistralApiKey
-                ? 'opacity-50 cursor-not-allowed'
-                : 'hover:shadow-lg hover:bg-[var(--color-accent-bg-hover)]'
-            }`}
-            disabled={!localSettings.googleApiKey && !localSettings.zhipuApiKey && !localSettings.mistralApiKey}
-          >
-            {selectedLanguage === 'en' ? 'Save Settings' : 'सेटिंग्ज जतन करा'}
-          </button>
+          {/* Footer */}
+          <div className="flex justify-end gap-3 p-6 border-t border-[var(--color-border)] bg-[var(--color-bg)]">
+            <button
+              onClick={onClose}
+              className="px-6 py-3 text-[var(--color-text-primary)] hover:bg-[var(--color-card)] rounded-xl transition-colors font-medium"
+            >
+              {selectedLanguage === 'en' ? 'Cancel' : 'रद्द करा'}
+            </button>
+            <button
+              onClick={handleSave}
+              className={`px-6 py-3 bg-[var(--color-accent-bg)] text-[var(--color-accent-text)] rounded-xl transition-all duration-200 font-semibold ${
+                !localSettings.googleApiKey && !localSettings.zhipuApiKey && !localSettings.mistralApiKey
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:shadow-lg hover:bg-[var(--color-accent-bg-hover)]'
+              }`}
+            >
+              {selectedLanguage === 'en' ? 'Save Settings' : 'सेटिंग्ज जतन करा'}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
