@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Biryani:wght@200;300;400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,143 +7,202 @@
 
 @layer base {
   :root {
-    /* Dark theme colors (ChatBotUI style) */
-    --color-bg: #0f0f0f;
-    --color-sidebar: #0a0a0a;
-    --color-card: #171717;
-    --color-border: #2a2a2a;
-    --color-text-primary: #ffffff;
-    --color-text-secondary: #9ca3af;
-    --color-text-muted: #6b7280;
-    --color-accent: #3b82f6;
-    --color-accent-hover: #2563eb;
-    --color-accent-light: rgba(59, 130, 246, 0.1);
-    --color-message-user: #1f2937;
-    --color-message-assistant: #111827;
-    --color-input: #1f1f1f;
-    --color-input-border: #374151;
-    --color-input-focus: #4f46e5;
+    --color-bg: #000000;
+    --color-sidebar: #0A0A0A;
+    --color-card: #1A1A1A;
+    --color-border: #2A2A2A;
+    --color-text-primary: #E5E5E5;
+    --color-text-secondary: #9CA3AF;
+    --color-text-placeholder: #6B7280;
+    --color-accent: #3B82F6;
+    --color-accent-hover: #2563EB;
     --font-weight: 400;
     --font-marathi: 'Biryani', sans-serif;
-    --font-english: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-english: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
   }
 
-  * {
-    box-sizing: border-box;
+  .light-theme {
+    --color-bg: #ffffff;
+    --color-sidebar: #f8f9fa;
+    --color-card: #ffffff;
+    --color-border: #dee2e6;
+    --color-text-primary: #212529;
+    --color-text-secondary: #6c757d;
+    --color-text-placeholder: #adb5bd;
+    --color-accent: #3B82F6;
+    --color-accent-hover: #2563EB;
+  }
+
+  body {
+    @apply bg-[var(--color-bg)] text-[var(--color-text-primary)] font-sans font-[var(--font-weight)];
+    font-family: var(--font-english);
+    overflow-x: hidden;
+  }
+
+  /* Enhanced Marathi/Devanagari font styling with Biryani */
+  body[data-lang="mr"],
+  .marathi-text,
+  [lang="mr"] {
+    font-family: var(--font-marathi) !important;
+    font-weight: 600 !important;
+    font-size: 1.15em !important;
+    line-height: 1.7 !important;
+    letter-spacing: 0.01em !important;
+    text-rendering: optimizeLegibility;
+    -webkit-font-feature-settings: "liga" 1, "calt" 1, "kern" 1, "dlig" 1;
+    font-feature-settings: "liga" 1, "calt" 1, "kern" 1, "dlig" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Font weight mapping to maintain consistency with English */
+  .marathi-text.font-medium,
+  [lang="mr"].font-medium,
+  body[data-lang="mr"] .font-medium {
+    font-weight: 700 !important;
+  }
+
+  .marathi-text.font-semibold,
+  [lang="mr"].font-semibold,
+  body[data-lang="mr"] .font-semibold {
+    font-weight: 800 !important;
+  }
+
+  .marathi-text.font-bold,
+  [lang="mr"].font-bold,
+  body[data-lang="mr"] .font-bold {
+    font-weight: 900 !important;
+  }
+
+  /* Force bold for specific UI elements in Marathi */
+  body[data-lang="mr"] button,
+  body[data-lang="mr"] .btn,
+  [lang="mr"] button,
+  [lang="mr"] .btn {
+    font-family: var(--font-marathi) !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Specific adjustments for different UI elements in Marathi */
+  body[data-lang="mr"] h1,
+  body[data-lang="mr"] h2,
+  body[data-lang="mr"] h3,
+  body[data-lang="mr"] h4,
+  body[data-lang="mr"] h5,
+  body[data-lang="mr"] h6,
+  [lang="mr"] h1,
+  [lang="mr"] h2,
+  [lang="mr"] h3,
+  [lang="mr"] h4,
+  [lang="mr"] h5,
+  [lang="mr"] h6 {
+    font-family: var(--font-marathi) !important;
+    font-weight: 800 !important;
+    line-height: 1.5 !important;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Input and form elements in Marathi */
+  body[data-lang="mr"] input,
+  body[data-lang="mr"] textarea,
+  body[data-lang="mr"] select,
+  [lang="mr"] input,
+  [lang="mr"] textarea,
+  [lang="mr"] select {
+    font-family: var(--font-marathi) !important;
+    font-weight: 600 !important;
+    font-size: 1.05em !important;
+  }
+
+  /* Placeholder text in Marathi */
+  body[data-lang="mr"] input::placeholder,
+  body[data-lang="mr"] textarea::placeholder,
+  [lang="mr"] input::placeholder,
+  [lang="mr"] textarea::placeholder {
+    font-family: var(--font-marathi) !important;
+    font-weight: 600 !important;
+    opacity: 0.7;
+  }
+
+  /* Force bold for navigation and important text in Marathi */
+  body[data-lang="mr"] .sidebar button,
+  body[data-lang="mr"] .sidebar .font-semibold,
+  [lang="mr"] .sidebar button,
+  [lang="mr"] .sidebar .font-semibold {
+    font-weight: 800 !important;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
   }
 
   html {
     scroll-behavior: smooth;
   }
 
-  body {
-    @apply bg-[var(--color-bg)] text-[var(--color-text-primary)] font-[var(--font-weight)];
-    font-family: var(--font-english);
+  /* Ensure long text wraps and doesn't overflow */
+  .prose p,
+  .prose li,
+  .prose code,
+  .prose pre {
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  /* For the message bubble container */
+  .message-bubble {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* For the chat input textarea */
+  textarea {
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  /* Prevent horizontal overflow in the messages container */
+  .messages-container {
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Enhanced Marathi/Devanagari font styling */
-  body[data-lang="mr"],
-  .marathi-text,
-  [lang="mr"] {
-    font-family: var(--font-marathi) !important;
-    font-weight: 500 !important;
-    font-size: 1.05em !important;
-    line-height: 1.6 !important;
-    letter-spacing: 0.01em !important;
-  }
-
-  body[data-lang="mr"] .font-medium,
-  [lang="mr"].font-medium {
-    font-weight: 600 !important;
-  }
-
-  body[data-lang="mr"] .font-semibold,
-  [lang="mr"].font-semibold {
-    font-weight: 700 !important;
-  }
-
-  body[data-lang="mr"] .font-bold,
-  [lang="mr"].font-bold {
-    font-weight: 800 !important;
   }
 }
 
 @layer components {
-  /* Scrollbar Styling */
+  /* Enhanced Scrollbars */
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--color-sidebar);
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(107, 114, 128, 0.4);
-    border-radius: 4px;
+    background: var(--color-border);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.6);
+    background: var(--color-accent);
   }
 
-  /* Custom Button Styles */
-  .btn-primary {
-    @apply bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 border border-[var(--color-accent)] hover:border-[var(--color-accent-hover)];
+  /* Smooth sidebar transitions */
+  .sidebar {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform: translateZ(0);
   }
 
-  .btn-secondary {
-    @apply bg-[var(--color-card)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)] font-medium px-4 py-2 rounded-lg transition-all duration-200 border border-[var(--color-border)] hover:border-[var(--color-text-muted)];
+  .sidebar-folded {
+    transform: translateX(-100%) translateZ(0);
   }
 
-  .btn-ghost {
-    @apply bg-transparent hover:bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] font-medium px-3 py-2 rounded-lg transition-all duration-200;
-  }
-
-  /* Input Styling */
-  .input-primary {
-    @apply bg-[var(--color-input)] border border-[var(--color-input-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus)] focus:border-[var(--color-input-focus)] transition-all duration-200;
-  }
-
-  /* Message Bubble Improvements */
-  .message-bubble {
-    @apply max-w-none w-full;
-  }
-
-  .message-user {
-    @apply bg-[var(--color-message-user)] border border-[var(--color-border)] rounded-xl p-4 mb-4;
-  }
-
-  .message-assistant {
-    @apply bg-[var(--color-message-assistant)] border border-[var(--color-border)] rounded-xl p-4 mb-4;
-  }
-
-  /* Sidebar Styling */
-  .sidebar-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card)] cursor-pointer;
-  }
-
-  .sidebar-item.active {
-    @apply bg-[var(--color-card)] text-[var(--color-text-primary)] border border-[var(--color-border)];
-  }
-
-  /* Modal Styling */
-  .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-4;
-  }
-
-  .modal-content {
-    @apply bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden;
-  }
-
-  /* Animations */
-  @keyframes slideInFromBottom {
+  /* Message animations */
+  @keyframes slideUp {
     from {
-      transform: translateY(20px);
+      transform: translateY(100%);
       opacity: 0;
     }
     to {
@@ -152,82 +211,146 @@
     }
   }
 
-  @keyframes slideInFromLeft {
-    from {
-      transform: translateX(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes fadeIn {
+  @keyframes fadeInUp {
     from {
       opacity: 0;
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
     }
     50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Smooth loading states */
+  .loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Button hover effects */
+  .smooth-button {
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform: translateZ(0);
+  }
+
+  .smooth-button:hover {
+    transform: translateY(-1px) translateZ(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .smooth-button:active {
+    transform: translateY(0) translateZ(0);
+    transition: all 0.1s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  /* Message bubble improvements */
+  .message-bubble {
+    transition: all 0.2s ease-out;
+    transform: translateZ(0);
+  }
+
+  .message-bubble:hover {
+    transform: translateY(-1px) translateZ(0);
+  }
+
+  /* Smooth focus states */
+  .focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    transition: outline-offset 0.2s ease;
+  }
+
+  /* Chat input improvements */
+  .chat-input {
+    transition: all 0.2s ease;
+  }
+
+  .chat-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+  }
+
+  /* Typing indicator */
+  .typing-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #9CA3AF;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  .typing-dot:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  @keyframes typing {
+    0%, 80%, 100% {
+      transform: scale(0.8);
       opacity: 0.5;
     }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 
-  .animate-slide-in-bottom {
-    animation: slideInFromBottom 0.3s ease-out;
-  }
-
-  .animate-slide-in-left {
-    animation: slideInFromLeft 0.3s ease-out;
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  .animate-pulse-soft {
-    animation: pulse 2s infinite;
-  }
-
-  /* Focus States */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-opacity-50 transition-all duration-200;
-  }
-
-  /* Hover Effects */
-  .hover-lift {
-    @apply transform transition-transform duration-200 hover:-translate-y-0.5;
-  }
-
-  /* Card Styling */
-  .card {
-    @apply bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl p-6 shadow-sm;
-  }
-
-  /* Typography */
-  .text-gradient {
-    background: linear-gradient(135deg, var(--color-accent) 0%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Mobile Optimizations */
+  /* Enhanced mobile experience */
   @media (max-width: 768px) {
-    .mobile-padding {
-      @apply px-4 py-2;
+    /* Improved touch targets */
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
     }
 
-    .mobile-text {
-      @apply text-sm;
+    /* Better scroll momentum on iOS */
+    .scroll-container {
+      -webkit-overflow-scrolling: touch;
+      overflow-scrolling: touch;
     }
 
     /* Prevent zoom on input focus */
@@ -235,6 +358,7 @@
       font-size: 16px;
     }
 
+    /* Marathi adjustments for mobile */
     body[data-lang="mr"] input,
     body[data-lang="mr"] textarea,
     [lang="mr"] input,
@@ -243,20 +367,71 @@
     }
   }
 
-  /* Loading States */
-  .loading-skeleton {
-    @apply bg-[var(--color-border)] animate-pulse rounded;
+  /* PWA Install Prompt Animation */
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
   }
 
-  /* Code Blocks */
-  .code-block {
-    @apply bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-4 font-mono text-sm overflow-x-auto;
+  /* PWA Specific Styles */
+  @media (display-mode: standalone) {
+    body {
+      user-select: none;
+    }
+
+    /* Hide scrollbars in standalone mode for cleaner look */
+    ::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    /* Better safe area handling */
+    .pwa-safe-area {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
   }
 
-  /* Selection */
-  ::selection {
-    background: rgba(59, 130, 246, 0.3);
-    color: var(--color-text-primary);
+  /* Mobile PWA adjustments */
+  @media (max-width: 768px) and (display-mode: standalone) {
+    .sidebar {
+      padding-top: env(safe-area-inset-top);
+    }
+
+    .mobile-chat-area {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    }
+  }
+
+  /* Smooth modal transitions */
+  .modal-backdrop {
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+  }
+
+  .modal-content {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  .modal-content.open {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Loading states */
+  .pulse-subtle {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
   }
 
   /* Improved accessibility */
@@ -272,15 +447,22 @@
     border: 0;
   }
 
-  /* High contrast support */
+  /* High contrast mode support */
   @media (prefers-contrast: high) {
     :root {
-      --color-border: #555555;
-      --color-text-secondary: #cccccc;
+      --color-border: #000000;
+      --color-text-primary: #000000;
+      --color-bg: #ffffff;
+    }
+
+    .dark {
+      --color-border: #ffffff;
+      --color-text-primary: #ffffff;
+      --color-bg: #000000;
     }
   }
 
-  /* Reduced motion support */
+  /* Reduced motion for accessibility */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -292,46 +474,39 @@
     }
   }
 
-  /* Chat-specific improvements */
-  .chat-container {
-    @apply flex flex-col h-screen bg-[var(--color-bg)];
+  /* Smooth spring animations */
+  .spring-bounce {
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  .chat-messages {
-    @apply flex-1 overflow-y-auto px-4 py-6;
+  .spring-gentle {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
-  .chat-input-container {
-    @apply border-t border-[var(--color-border)] bg-[var(--color-bg)] p-4;
+  /* Custom button styles that match chat UI */
+  .chat-ui-button {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
   }
 
-  .chat-input {
-    @apply w-full bg-[var(--color-input)] border border-[var(--color-input-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-200 resize-none;
+  .chat-ui-button:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #2563eb 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
   }
 
-  /* Model selector styling */
-  .model-selector {
-    @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
+  .chat-ui-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
   }
 
-  .model-option {
-    @apply flex items-center gap-3 p-4 border border-[var(--color-border)] rounded-lg cursor-pointer transition-all duration-200 hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-light)];
-  }
-
-  .model-option.selected {
-    @apply border-[var(--color-accent)] bg-[var(--color-accent-light)];
-  }
-
-  /* Conversation list styling */
-  .conversation-list {
-    @apply space-y-1 p-2;
-  }
-
-  .conversation-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer hover:bg-[var(--color-card)] group;
-  }
-
-  .conversation-item.active {
-    @apply bg-[var(--color-card)] border border-[var(--color-border)];
+  .chat-ui-button:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
