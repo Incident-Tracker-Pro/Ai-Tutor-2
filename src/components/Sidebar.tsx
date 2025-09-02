@@ -118,11 +118,11 @@ export function Sidebar({
                       ? 'bg-blue-100 dark:bg-blue-900/30 border border-blue-500 text-blue-700 dark:text-blue-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
-                  title="Google Gemini"
+                  title="Gemma Ma'am"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                    Gemini
+                    {selectedLanguage === 'en' ? 'Gemma' : 'जेम्मा'}
                   </span>
                 </button>
                 <button
@@ -132,11 +132,11 @@ export function Sidebar({
                       ? 'bg-purple-100 dark:bg-purple-900/30 border border-purple-500 text-purple-700 dark:text-purple-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
-                  title="ZhipuAI"
+                  title="Zhipu Sir"
                 >
-                  <Bot className="w-4 h-4" />
+                  <Smile className="w-4 h-4" />
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                    ZhipuAI
+                    {selectedLanguage === 'en' ? 'Zhipu' : 'झिपू'}
                   </span>
                 </button>
                 <button
@@ -146,11 +146,13 @@ export function Sidebar({
                       ? 'bg-green-100 dark:bg-green-900/30 border border-green-500 text-green-700 dark:text-green-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
-                  title="Mistral Small"
+                  title="Misty Ma'am"
                 >
-                  <Bot className="w-4 h-4" />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3c0 1.5-1.5 3-3 3s-3-1.5-3-3a3 3 0 0 0-3 3c0 1.5 1.5 3 3 3s3 1.5 3 3a3 3 0 0 0 3 3c0 1.5 1.5 3 3 3s3-1.5 3-3a3 3 0 0 0 3-3c0-1.5-1.5-3-3-3s-3 1.5-3 3a3 3 0 0 1-3 3z"></path>
+                  </svg>
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                    Mistral
+                    {selectedLanguage === 'en' ? 'Misty' : 'मिस्टी'}
                   </span>
                 </button>
                 <button
@@ -160,11 +162,13 @@ export function Sidebar({
                       ? 'bg-orange-100 dark:bg-orange-900/30 border border-orange-500 text-orange-700 dark:text-orange-300'
                       : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 border border-transparent text-gray-600 dark:text-gray-300'
                   }`}
-                  title="Codestral"
+                  title="Cody Sir"
                 >
-                  <Bot className="w-4 h-4" />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path>
+                  </svg>
                   <span className={`text-xs font-medium ${selectedLanguage === 'mr' ? 'font-semibold' : ''}`}>
-                    Codestral
+                    {selectedLanguage === 'en' ? 'Cody' : 'कोडी'}
                   </span>
                 </button>
               </div>
