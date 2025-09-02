@@ -234,7 +234,7 @@ function App() {
         isSidebarFolded={sidebarFolded}
       />
       
-      <div className={`transition-all duration-300 ease-in-out ${sidebarOpen ? 'block' : 'hidden'}`}>
+      <div className={`transition-all duration-300 ease-in-out ${sidebarOpen ? 'block' : 'hidden'} lg:block`}>
         <Sidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -246,7 +246,7 @@ function App() {
           onModelChange={handleModelChange}
           onCloseSidebar={() => setSidebarOpen(false)}
           isFolded={sidebarFolded}
-          onToggleFold={handleToggleSidebarFold}
+          onToggleFold={handleToggleFold}
         />
       </div>
 
