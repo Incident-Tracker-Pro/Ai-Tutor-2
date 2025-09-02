@@ -51,7 +51,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -150,11 +149,11 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                     {selectedLanguage === 'en' ? 'AI Model' : 'एआय मॉडेल'}
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
                     <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      localSettings.selectedModel === 'google' 
-                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800' 
+                      localSettings.selectedModel === 'google'
+                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800'
                         : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
                     }`}>
                       <input
@@ -162,7 +161,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                         name="model"
                         value="google"
                         checked={localSettings.selectedModel === 'google'}
-                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' }))}
+                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
                         className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                       />
                       <div className="flex items-center gap-3 flex-1">
@@ -176,11 +175,10 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                       </div>
                     </div>
                   </label>
-
                   <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
                     <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      localSettings.selectedModel === 'zhipu' 
-                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800' 
+                      localSettings.selectedModel === 'zhipu'
+                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800'
                         : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
                     }`}>
                       <input
@@ -188,7 +186,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                         name="model"
                         value="zhipu"
                         checked={localSettings.selectedModel === 'zhipu'}
-                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' }))}
+                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
                         className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                       />
                       <div className="flex items-center gap-3 flex-1">
@@ -198,6 +196,56 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                         <div>
                           <div className="font-semibold text-gray-900 dark:text-gray-100">ZhipuAI</div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">GLM-4.5-Flash</div>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
+                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
+                      localSettings.selectedModel === 'mistral-small'
+                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800'
+                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="model"
+                        value="mistral-small"
+                        checked={localSettings.selectedModel === 'mistral-small'}
+                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
+                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                      />
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900 dark:text-gray-100">Mistral Small</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">mistral-small-latest</div>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                  <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
+                    <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
+                      localSettings.selectedModel === 'mistral-codestral'
+                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800'
+                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="model"
+                        value="mistral-codestral"
+                        checked={localSettings.selectedModel === 'mistral-codestral'}
+                        onChange={(e) => setLocalSettings(prev => ({ ...prev, selectedModel: e.target.value as 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral' }))}
+                        className="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                      />
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center">
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900 dark:text-gray-100">Codestral</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">codestral-latest</div>
                         </div>
                       </div>
                     </div>
@@ -213,11 +261,11 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                     {selectedLanguage === 'en' ? 'Language' : 'भाषा'}
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
                     <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      selectedLanguage === 'en' 
-                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800' 
+                      selectedLanguage === 'en'
+                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800'
                         : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
                     }`}>
                       <input
@@ -236,11 +284,10 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                       </div>
                     </div>
                   </label>
-
                   <label className={`group cursor-pointer transition-all duration-200 hover:shadow-md`}>
                     <div className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${
-                      selectedLanguage === 'mr' 
-                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800' 
+                      selectedLanguage === 'mr'
+                        ? 'border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800'
                         : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
                     }`}>
                       <input
@@ -353,6 +400,49 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                   </div>
                 </div>
               </div>
+
+              {/* Mistral API Key */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-green-500" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {selectedLanguage === 'en' ? 'Mistral API Key' : 'मिस्ट्रल एपीआय की'}
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Key className="w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors" />
+                    </div>
+                    <input
+                      type="password"
+                      value={localSettings.mistralApiKey}
+                      onChange={(e) => setLocalSettings(prev => ({ ...prev, mistralApiKey: e.target.value }))}
+                      placeholder={selectedLanguage === 'en' ? 'Enter your Mistral API key' : 'आपली मिस्ट्रल एपीआय की टाका'}
+                      className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
+                    />
+                  </div>
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                    <p className="text-sm text-green-800 dark:text-green-300">
+                      {selectedLanguage === 'en' ? (
+                        <>
+                          Get your API key from{' '}
+                          <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener noreferrer" className="font-medium underline hover:no-underline">
+                            Mistral La Plateforme
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          आपली एपीआय की येथून मिळवा{' '}
+                          <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener noreferrer" className="font-medium underline hover:no-underline">
+                            मिस्ट्रल ला प्लॅटफॉर्म
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -365,8 +455,8 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                     {selectedLanguage === 'en' ? 'Data Management' : 'डेटा व्यवस्थापन'}
                   </h3>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-2 gap-4">
                   <button
                     onClick={handleExportData}
                     className="group flex flex-col items-center gap-3 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
@@ -383,7 +473,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                       </div>
                     </div>
                   </button>
-
                   <button
                     onClick={triggerFileInput}
                     className="group flex flex-col items-center gap-3 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
@@ -401,7 +490,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                     </div>
                   </button>
                 </div>
-
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                   <p className="text-sm text-yellow-800 dark:text-yellow-300">
                     <strong>{selectedLanguage === 'en' ? 'Note:' : 'टीप:'}</strong>{' '}
@@ -410,7 +498,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                       : 'आपला डेटा आपल्या ब्राउझरमध्ये स्थानिक पातळीवर संग्रहीत आहे. नियमित बॅकअप घेण्याची शिफारस केली जाते.'}
                   </p>
                 </div>
-
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -434,11 +521,11 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
           <button
             onClick={handleSave}
             className={`px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 dark:from-gray-700 dark:to-gray-800 text-white rounded-xl transition-all duration-200 font-semibold ${
-              !localSettings.googleApiKey && !localSettings.zhipuApiKey
+              !localSettings.googleApiKey && !localSettings.zhipuApiKey && !localSettings.mistralApiKey
                 ? 'opacity-50 cursor-not-allowed'
                 : 'hover:shadow-lg hover:scale-105'
             }`}
-            disabled={!localSettings.googleApiKey && !localSettings.zhipuApiKey}
+            disabled={!localSettings.googleApiKey && !localSettings.zhipuApiKey && !localSettings.mistralApiKey}
           >
             {selectedLanguage === 'en' ? 'Save Settings' : 'सेटिंग्ज जतन करा'}
           </button>
