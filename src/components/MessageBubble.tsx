@@ -10,7 +10,7 @@ import { LanguageContext } from '../contexts/LanguageContext';
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
-  model?: 'google' | 'zhipu';
+  model?: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
   onEditMessage?: (messageId: string, newContent: string) => void;
   onRegenerateResponse?: (messageId: string) => void;
 }
@@ -31,8 +31,12 @@ export function MessageBubble({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const copyTimeoutRef = useRef<NodeJS.Timeout>();
-
-  const displayModel = isUser ? undefined : (message.model || model);
+  const displayModel = isUser ? undefined : (
+    message.model ||
+    (model === 'mistral-small' ? 'Mistral Small' :
+     model === 'mistral-codestral' ? 'Codestral' :
+     model === 'google' ? 'Google Gemini' : 'ZhipuAI')
+  );
 
   const handleCopy = useCallback(async () => {
     try {
@@ -97,14 +101,12 @@ export function MessageBubble({
     if (bubbleRef.current) {
       bubbleRef.current.style.transform = 'translateY(20px)';
       bubbleRef.current.style.opacity = '0';
-
       const timeout = setTimeout(() => {
         if (bubbleRef.current) {
           bubbleRef.current.style.transform = 'translateY(0)';
           bubbleRef.current.style.opacity = '1';
         }
       }, 50);
-
       return () => clearTimeout(timeout);
     }
   }, []);
@@ -121,7 +123,6 @@ export function MessageBubble({
           <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </div>
       )}
-
       <div
         className={`relative max-w-[80%] p-4 rounded-xl bg-gray-200 dark:bg-gray-300 ${
           isUser ? 'text-black font-semibold' : 'text-black font-medium'
@@ -129,10 +130,9 @@ export function MessageBubble({
       >
         {!isUser && displayModel && (
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">
-            {displayModel === 'google' ? 'Google Gemini' : 'ZhipuAI'}
+            {displayModel}
           </div>
         )}
-
         {isEditing ? (
           <div className="space-y-3">
             <textarea
@@ -217,7 +217,6 @@ export function MessageBubble({
             )}
           </div>
         )}
-
         {!isEditing && !isStreaming && message.content.length > 0 && (
           <div className={`absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
             {!isUser && onRegenerateResponse && (
@@ -250,7 +249,6 @@ export function MessageBubble({
           </div>
         )}
       </div>
-
       {isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 dark:bg-gray-500">
           <Smile className="w-5 h-5 text-white" />
