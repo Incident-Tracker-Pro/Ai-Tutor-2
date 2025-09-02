@@ -31,11 +31,12 @@ export function MessageBubble({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const copyTimeoutRef = useRef<NodeJS.Timeout>();
+
   const displayModel = isUser ? undefined : (
     message.model ||
-    (model === 'mistral-small' ? 'Mistral Small' :
-     model === 'mistral-codestral' ? 'Codestral' :
-     model === 'google' ? 'Google Gemini' : 'ZhipuAI')
+    (model === 'mistral-small' ? 'Misty Ma\'am' :
+     model === 'mistral-codestral' ? 'Cody Sir' :
+     model === 'google' ? 'Gemma Ma\'am' : 'Zhipu Sir')
   );
 
   const handleCopy = useCallback(async () => {
@@ -120,7 +121,18 @@ export function MessageBubble({
     >
       {!isUser && (
         <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-          <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          {model === 'google' && <Sparkles className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
+          {model === 'zhipu' && <Smile className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
+          {model === 'mistral-small' && (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 dark:text-gray-300">
+              <path d="M12 2a3 3 0 0 0-3 3c0 1.5-1.5 3-3 3s-3-1.5-3-3a3 3 0 0 0-3 3c0 1.5 1.5 3 3 3s3 1.5 3 3a3 3 0 0 0 3 3c0 1.5 1.5 3 3 3s3-1.5 3-3a3 3 0 0 0 3-3c0-1.5-1.5-3-3-3s-3 1.5-3 3a3 3 0 0 1-3 3z"></path>
+            </svg>
+          )}
+          {model === 'mistral-codestral' && (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600 dark:text-gray-300">
+              <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path>
+            </svg>
+          )}
         </div>
       )}
       <div
