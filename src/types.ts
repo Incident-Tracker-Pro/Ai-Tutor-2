@@ -6,7 +6,6 @@ export interface Message {
   isEditing?: boolean;
   originalContent?: string;
   model?: 'google' | 'zhipu' | 'mistral-small' | 'mistral-codestral';
-  files?: string[];
 }
 
 export interface Conversation {
