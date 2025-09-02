@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -10,9 +10,6 @@ import { generateId, generateConversationTitle } from './utils/helpers';
 import { usePWA } from './hooks/usePWA';
 import { Menu } from 'lucide-react';
 import { LanguageContext } from './contexts/LanguageContext';
-import * as pdfjsLib from 'pdfjs-dist';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const defaultSettings: APISettings = {
   googleApiKey: '',
@@ -76,7 +73,6 @@ function App() {
   };
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
-
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey || settings.mistralApiKey;
 
   const handleNewConversation = (isDocumentChat: boolean = false) => {
@@ -128,47 +124,61 @@ function App() {
     }
   };
 
-  const extractTextFromPDF = async (file: File): Promise<string> => {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-    let text = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      text += content.items.map((item: any) => item.str).join(' ');
-    }
-    return text;
-  };
-
   const handleFileUpload = async (file: File) => {
     if (!currentConversationId) return;
 
-    let content = '';
-    if (file.type === 'application/pdf') {
-      content = await extractTextFromPDF(file);
-    } else {
-      content = await file.text();
-    }
+    try {
+      let content = '';
+      if (file.type === 'application/pdf') {
+        // Use pdf-parse for PDF text extraction
+        const pdfParse = (await import('pdf-parse')).default;
+        const arrayBuffer = await file.arrayBuffer();
+        const data = await pdfParse(arrayBuffer);
+        content = data.text;
+      } else {
+        content = await file.text();
+      }
 
-    setConversations(prev =>
-      prev.map(conv =>
-        conv.id === currentConversationId
-          ? {
-              ...conv,
-              documentName: file.name,
-              messages: [
-                ...conv.messages,
-                {
-                  id: generateId(),
-                  content: `${selectedLanguage === 'en' ? 'Document uploaded:' : 'दस्तऐवज अपलोड केले:'} **${file.name}**\n\n${selectedLanguage === 'en' ? 'You can now ask questions about this document.' : 'तुम्ही आता या दस्तऐवजाबद्दल प्रश्न विचारण्यास सुरुवात करू शकता.'}`,
-                  role: 'assistant',
-                  timestamp: new Date(),
-                },
-              ],
-            }
-          : conv
-      )
-    );
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === currentConversationId
+            ? {
+                ...conv,
+                documentName: file.name,
+                messages: [
+                  ...conv.messages,
+                  {
+                    id: generateId(),
+                    content: `${selectedLanguage === 'en' ? 'Document uploaded:' : 'दस्तऐवज अपलोड केले:'} **${file.name}**\n\n${selectedLanguage === 'en' ? 'You can now ask questions about this document.' : 'तुम्ही आता या दस्तऐवजाबद्दल प्रश्न विचारण्यास सुरुवात करू शकता.'}`,
+                    role: 'assistant',
+                    timestamp: new Date(),
+                  },
+                ],
+              }
+            : conv
+        )
+      );
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === currentConversationId
+            ? {
+                ...conv,
+                messages: [
+                  ...conv.messages,
+                  {
+                    id: generateId(),
+                    content: `${selectedLanguage === 'en' ? 'Error uploading document:' : 'दस्तऐवज अपलोड करण्यात त्रुटी:'} ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    role: 'assistant',
+                    timestamp: new Date(),
+                  },
+                ],
+              }
+            : conv
+        )
+      );
+    }
   };
 
   const handleSendMessage = async (content: string) => {
