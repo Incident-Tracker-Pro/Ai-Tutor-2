@@ -16,11 +16,11 @@ interface ChatAreaProps {
   onRegenerateResponse?: (messageId: string) => void;
 }
 
-export function ChatArea({ 
-  messages, 
-  onSendMessage, 
-  isLoading, 
-  streamingMessage, 
+export function ChatArea({
+  messages,
+  onSendMessage,
+  isLoading,
+  streamingMessage,
   hasApiKey,
   model,
   onEditMessage,
@@ -34,7 +34,7 @@ export function ChatArea({
   const lastScrollTop = useRef(0);
 
   const scrollToBottom = (smooth = true) => {
-    messagesEndRef.current?.scrollIntoView({ 
+    messagesEndRef.current?.scrollIntoView({
       behavior: smooth ? 'smooth' : 'auto',
       block: 'end'
     });
@@ -48,21 +48,21 @@ export function ChatArea({
 
   const handleScroll = () => {
     if (!messagesContainerRef.current) return;
-    
+
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 10;
     const scrollingUp = scrollTop < lastScrollTop.current;
-    
+
     if (scrollingUp && !isAtBottom) {
       setUserScrolled(true);
       setShowScrollToBottom(true);
     }
-    
+
     if (isAtBottom) {
       setUserScrolled(false);
       setShowScrollToBottom(false);
     }
-    
+
     lastScrollTop.current = scrollTop;
   };
 
@@ -110,9 +110,9 @@ export function ChatArea({
           </div>
         </div>
       ) : (
-        <div 
+        <div
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto scroll-smooth"
+          className="flex-1 overflow-y-auto scroll-smooth messages-container"
           onScroll={handleScroll}
           style={{
             scrollBehavior: userScrolled ? 'auto' : 'smooth',
@@ -142,7 +142,6 @@ export function ChatArea({
           <div ref={messagesEndRef} />
         </div>
       )}
-
       {showScrollToBottom && (
         <button
           onClick={() => {
@@ -168,7 +167,7 @@ export function ChatArea({
           </svg>
         </button>
       )}
-      
+
       <div className="border-t border-gray-200 p-4 bg-white/90 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto">
           <ChatInput
