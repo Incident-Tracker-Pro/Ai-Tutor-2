@@ -99,7 +99,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings, isSid
         }`}
       />
       <div
-        className={`fixed top-0 bottom-0 z-40 w-full max-w-sm bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 bottom-0 z-40 w-full max-w-xs bg-[var(--color-sidebar)] border-r border-[var(--color-border)] shadow-2xl transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ left: sidebarWidth }}
