@@ -144,7 +144,7 @@ export function MessageBubble({
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full min-h-[100px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black font-medium"
+              className="w-full min-h-[100px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black font-medium whitespace-pre-wrap break-words"
               placeholder={selectedLanguage === 'en' ? 'Edit your message...' : 'आपला संदेश संपादित करा...'}
             />
             <div className="flex gap-2 justify-end">
@@ -171,7 +171,7 @@ export function MessageBubble({
             </p>
           </div>
         ) : (
-          <div className={`prose prose-base max-w-none leading-relaxed ${isUser ? 'font-semibold' : ''}`}>
+          <div className={`prose prose-base max-w-none leading-relaxed ${isUser ? 'font-semibold' : ''} whitespace-pre-wrap break-words`}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -202,7 +202,7 @@ export function MessageBubble({
                           style={oneDark}
                           language={match[1]}
                           PreTag="div"
-                          className="rounded-md"
+                          className="rounded-md whitespace-pre-wrap break-words"
                           {...props}
                         >
                           {codeContent}
@@ -211,7 +211,7 @@ export function MessageBubble({
                     );
                   } else {
                     return (
-                      <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm" {...props}>
+                      <code className="bg-gray-300 dark:bg-gray-600 px-1.5 py-0.5 rounded text-sm whitespace-pre-wrap break-words" {...props}>
                         {children}
                       </code>
                     );
@@ -228,13 +228,16 @@ export function MessageBubble({
                 },
                 th({ children }) {
                   return (
-                    <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium">
+                    <th className="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-600 font-medium whitespace-pre-wrap break-words">
                       {children}
                     </th>
                   );
                 },
                 td({ children }) {
-                  return <td className="border border-gray-300 dark:border-gray-600 p-2">{children}</td>;
+                  return <td className="border border-gray-300 dark:border-gray-600 p-2 whitespace-pre-wrap break-words">{children}</td>;
+                },
+                p({ children }) {
+                  return <p className="whitespace-pre-wrap break-words">{children}</p>;
                 },
               }}
             >
