@@ -114,6 +114,7 @@ function App() {
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
     aiService.updateSettings(newSettings, selectedLanguage);
+    setIsSettingsOpen(false);
   };
 
   const handleInstallApp = async () => {
@@ -297,7 +298,15 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-[var(--color-bg)] text-[var(--color-text-primary)]">
+    <div className="h-screen flex bg-[var(--color-bg)] text-[var(--color-text-primary)] relative">
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        settings={settings}
+        onSaveSettings={handleSaveSettings}
+        isSidebarFolded={sidebarFolded}
+      />
+      
       {sidebarOpen && (
         <Sidebar
           conversations={conversations}
@@ -306,6 +315,8 @@ function App() {
           onSelectConversation={handleSelectConversation}
           onDeleteConversation={handleDeleteConversation}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          settings={settings}
+          onModelChange={handleModelChange}
           onCloseSidebar={() => setSidebarOpen(false)}
           isFolded={sidebarFolded}
           onToggleFold={handleToggleSidebarFold}
@@ -331,15 +342,6 @@ function App() {
         model={settings.selectedModel}
         onEditMessage={handleEditMessage}
         onRegenerateResponse={handleRegenerateResponse}
-        settings={settings}
-        onModelChange={handleModelChange}
-      />
-
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        settings={settings}
-        onSaveSettings={handleSaveSettings}
       />
 
       {isInstallable && !isInstalled && (
