@@ -297,7 +297,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-gray-900">
+    <div className="h-screen flex bg-[var(--color-bg)] text-[var(--color-text-primary)]">
       {sidebarOpen && (
         <Sidebar
           conversations={conversations}
@@ -306,8 +306,6 @@ function App() {
           onSelectConversation={handleSelectConversation}
           onDeleteConversation={handleDeleteConversation}
           onOpenSettings={() => setIsSettingsOpen(true)}
-          settings={settings}
-          onModelChange={handleModelChange}
           onCloseSidebar={() => setSidebarOpen(false)}
           isFolded={sidebarFolded}
           onToggleFold={handleToggleSidebarFold}
@@ -317,10 +315,10 @@ function App() {
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 p-2 bg-gray-600 dark:bg-gray-700 rounded-lg z-50 shadow-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+          className="fixed top-4 left-4 p-2 bg-[var(--color-card)] rounded-lg z-50 shadow-md hover:bg-[var(--color-border)] transition-colors"
           title={selectedLanguage === 'en' ? 'Open sidebar' : 'साइडबार उघडा'}
         >
-          <Menu className="w-5 h-5 text-white" />
+          <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
         </button>
       )}
 
@@ -333,6 +331,8 @@ function App() {
         model={settings.selectedModel}
         onEditMessage={handleEditMessage}
         onRegenerateResponse={handleRegenerateResponse}
+        settings={settings}
+        onModelChange={handleModelChange}
       />
 
       <SettingsModal
